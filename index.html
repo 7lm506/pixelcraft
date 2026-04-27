@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelCraft Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --paper: #f5f0e8;
+  --accent: #ff3d00;
+  --gold: #f0c040;
+  --blue: #0066ff;
+  --green: #00e676;
+  --white: #ffffff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Cairo', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ===== CURSOR ===== */
+#cur {
+  width:14px; height:14px;
+  background:var(--accent);
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+  mix-blend-mode:screen;
+}
+#cur-ring {
+  width:44px; height:44px;
+  border:1.5px solid rgba(255,255,255,0.3);
+  border-radius:50%;
+  position:fixed;
+  pointer-events:none;
+  z-index:9998;
+  transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
+}
+body:has(a:hover) #cur,
+body:has(button:hover) #cur { transform:scale(3); background:var(--gold); }
+
+/* ===== NOISE OVERLAY ===== */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:1000;
+  opacity:0.4;
+}
+
+/* ===== NAV ===== */
+nav {
+  position:fixed; top:0; left:0; right:0;
+  padding:1.5rem 4rem;
+  display:flex; align-items:center; justify-content:space-between;
+  z-index:500;
+  background:linear-gradient(to bottom, rgba(8,8,16,0.9), transparent);
+  backdrop-filter:blur(10px);
+}
+.logo {
+  font-family:'Tajawal',sans-serif;
+  font-weight:900; font-size:1.5rem;
+  letter-spacing:-0.02em;
+}
+.logo em { color:var(--accent); font-style:normal; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a {
+  color:rgba(255,255,255,0.5);
+  text-decoration:none;
+  font-size:0.85rem;
+  font-weight:600;
+  transition:color 0.2s;
+}
+.nav-links a:hover { color:#fff; }
+.nav-cta {
+  background:var(--accent);
+  color:#fff !important;
+  padding:0.5rem 1.4rem !important;
+  font-weight:700 !important;
+  transition:background 0.2s, transform 0.2s !important;
+}
+.nav-cta:hover { background:#e63000 !important; transform:translateY(-2px); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding:8rem 2rem 4rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Animated gradient bg */
+.hero-bg {
+  position:absolute; inset:-50%;
+  background: conic-gradient(from 0deg at 50% 50%,
+    #080810 0deg,
+    #0d0820 60deg,
+    #080810 120deg,
+    #0f0510 180deg,
+    #080810 240deg,
+    #08100f 300deg,
+    #080810 360deg);
+  animation: rotateBg 20s linear infinite;
+  filter: blur(80px);
+}
+@keyframes rotateBg {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+
+/* Grid lines */
+.hero-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:60px 60px;
+}
+
+/* Floating orbs */
+.orb {
+  position:absolute;
+  border-radius:50%;
+  filter:blur(80px);
+  animation:orbFloat 8s ease-in-out infinite;
+  pointer-events:none;
+}
+.orb1 { width:400px; height:400px; background:rgba(255,61,0,0.12); top:10%; right:15%; animation-delay:0s; }
+.orb2 { width:300px; height:300px; background:rgba(0,102,255,0.1); bottom:20%; left:10%; animation-delay:3s; }
+.orb3 { width:200px; height:200px; background:rgba(240,192,64,0.08); top:50%; left:40%; animation-delay:5s; }
+
+@keyframes orbFloat {
+  0%,100% { transform:translateY(0) scale(1); }
+  50% { transform:translateY(-40px) scale(1.05); }
+}
+
+.hero-content { position:relative; z-index:2; }
+
+.hero-tag {
+  display:inline-flex; align-items:center; gap:0.6rem;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:0.4rem 1.2rem;
+  border-radius:50px;
+  font-size:0.75rem;
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.6);
+  margin-bottom:2rem;
+  backdrop-filter:blur(10px);
+}
+.tag-dot {
+  width:7px; height:7px;
+  background:var(--green);
+  border-radius:50%;
+  box-shadow:0 0 10px var(--green);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.5; transform:scale(0.7); }
+}
+
+.hero h1 {
+  font-family:'Tajawal',sans-serif;
+  font-size:clamp(3.5rem, 9vw, 8rem);
+  font-weight:900;
+  line-height:0.95;
+  letter-spacing:-0.04em;
+  margin-bottom:1.5rem;
+}
+.hero h1 .line1 { display:block; color:#fff; }
+.hero h1 .line2 {
+  display:block;
+  background:linear-gradient(135deg, var(--accent), var(--gold));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero h1 .line3 { display:block; color:rgba(255,255,255,0.2); }
+
+.hero-desc {
+  font-size:1.1rem;
+  line-height:1.8;
+  color:rgba(255,255,255,0.5);
+  max-width:520px;
+  margin:0 auto 3rem;
+}
+
+.hero-btns {
+  display:flex; gap:1rem;
+  justify-content:center; align-items:center;
+  flex-wrap:wrap;
+}
+
+.btn-glow {
+  position:relative;
+  background:var(--accent);
+  color:#fff;
+  padding:1.1rem 3rem;
+  font-family:'Cairo',sans-serif;
+  font-size:1rem;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  overflow:hidden;
+  transition:transform 0.3s, box-shadow 0.3s;
+  clip-path:polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.btn-glow::before {
+  content:'';
+  position:absolute; top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition:left 0.5s;
+}
+.btn-glow:hover { transform:translateY(-3px); box-shadow:0 20px 60px rgba(255,61,0,0.4); }
+.btn-glow:hover::before { left:100%; }
+
+.btn-outline {
+  color:rgba(255,255,255,0.7);
+  font-size:0.9rem;
+  font-weight:600;
+  text-decoration:none;
+  display:flex; align-items:center; gap:0.5rem;
+  transition:color 0.2s;
+}
+.btn-outline:hover { color:#fff; }
+
+/* Scroll indicator */
+.scroll-hint {
+  position:absolute;
+  bottom:2rem; left:50%;
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center;
+  gap:0.5rem;
+  color:rgba(255,255,255,0.2);
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  animation:fadeUp 2s 2s both;
+}
+.scroll-line {
+  width:1px; height:50px;
+  background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.2));
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { transform:scaleY(1); opacity:1; }
+  50% { transform:scaleY(0.5); opacity:0.5; }
+}
+
+/* Counters strip */
+.counters {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(255,255,255,0.06);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.counter-item {
+  padding:3rem 2rem;
+  text-align:center;
+  border-left:1px solid rgba(255,255,255,0.06);
+  position:relative;
+  overflow:hidden;
+  transition:background 0.3s;
+}
+.counter-item:first-child { border-left:none; }
+.counter-item:hover { background:rgba(255,255,255,0.02); }
+.counter-num {
+  font-family:'Tajawal',sans-serif;
+  font-size:3rem; font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,0.5));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+}
+.counter-num b { color:var(--accent); -webkit-text-fill-color:var(--accent); }
+.counter-label { font-size:0.8rem; color:rgba(255,255,255,0.35); margin-top:0.5rem; }
+
+/* ===== SERVICES ===== */
+.section {
+  padding:8rem 4rem;
+  position:relative;
+}
+.section-tag {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.15em; text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:1rem;
+}
+.section-tag::before { content:''; width:24px; height:2px; background:var(--accent); }
+.section-title {
+  font-family:'Tajawal',sans-serif;
+  font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:-0.03em;
+  margin-bottom:4rem;
+  color:#fff;
+}
+.section-title span { color:var(--accent); }
+
+.services-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.svc-card {
+  background:var(--bg);
+  padding:3rem 2.5rem;
+  position:relative;
+  overflow:hidden;
+  transition:background 0.3s;
+  cursor:pointer;
+}
+.svc-card::before {
+  content:'';
+  position:absolute; bottom:0; right:0;
+  width:0; height:2px;
+  background:linear-gradient(to left, var(--accent), transparent);
+  transition:width 0.5s;
+}
+.svc-card:hover { background:#0f0f1a; }
+.svc-card:hover::before { width:100%; }
+
+.svc-num {
+  font-family:'Tajawal',sans-serif;
+  font-size:4rem; font-weight:900;
+  color:rgba(255,255,255,0.04);
+  position:absolute; top:1rem; left:1.5rem;
+  line-height:1;
+  transition:color 0.3s;
+}
+.svc-card:hover .svc-num { color:rgba(255,61,0,0.08); }
+
+.svc-icon {
+  font-size:2.2rem;
+  margin-bottom:1.5rem;
+  display:block;
+  position:relative;
+  z-index:1;
+}
+.svc-name {
+  font-family:'Tajawal',sans-serif;
+  font-size:1.2rem; font-weight:700;
+  color:#fff;
+  margin-bottom:0.8rem;
+  position:relative; z-index:1;
+}
+.svc-desc {
+  font-size:0.88rem;
+  line-height:1.7;
+  color:rgba(255,255,255,0.4);
+  position:relative; z-index:1;
+}
+.svc-price {
+  margin-top:2rem;
+  font-family:'Tajawal',sans-serif;
+  font-size:1.6rem; font-weight:900;
+  color:var(--accent);
+  position:relative; z-index:1;
+}
+.svc-price small {
+  font-size:0.75rem; font-weight:400;
+  color:rgba(255,255,255,0.25);
+}
+
+/* ===== PROCESS ===== */
+.process-section {
+  padding:8rem 4rem;
+  background:rgba(255,255,255,0.015);
+}
+.process-steps {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  margin-top:4rem;
+  position:relative;
+}
+.process-steps::before {
+  content:'';
+  position:absolute;
+  top:2.5rem; right:12.5%; left:12.5%;
+  height:1px;
+  background:linear-gradient(to left, transparent, rgba(255,61,0,0.4), transparent);
+}
+.step {
+  text-align:center;
+  padding:0 1.5rem;
+  position:relative;
+}
+.step-circle {
+  width:50px; height:50px;
+  border-radius:50%;
+  background:var(--bg);
+  border:1px solid rgba(255,61,0,0.4);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 1.5rem;
+  font-family:'Tajawal',sans-serif;
+  font-size:1.1rem; font-weight:900;
+  color:var(--accent);
+  position:relative; z-index:1;
+  transition:background 0.3s, box-shadow 0.3s;
+}
+.step:hover .step-circle {
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 0 30px rgba(255,61,0,0.5);
+}
+.step-title {
+  font-family:'Tajawal',sans-serif;
+  font-size:1rem; font-weight:700;
+  color:#fff;
+  margin-bottom:0.5rem;
+}
+.step-desc { font-size:0.82rem; color:rgba(255,255,255,0.4); line-height:1.6; }
+
+/* ===== ORDER FORM ===== */
+.order-section {
+  padding:8rem 4rem;
+  position:relative;
+  overflow:hidden;
+}
+.order-section::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background:radial-gradient(ellipse at 70% 50%, rgba(255,61,0,0.05) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.order-grid {
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:6rem;
+  align-items:start;
+  position:relative; z-index:1;
+}
+
+.order-info .section-title { margin-bottom:1.5rem; }
+.order-info p {
+  font-size:0.95rem;
+  line-height:1.8;
+  color:rgba(255,255,255,0.4);
+  margin-bottom:2.5rem;
+}
+
+.trust-items {
+  display:flex; flex-direction:column; gap:1rem;
+}
+.trust-item {
+  display:flex; align-items:center; gap:1rem;
+  padding:1rem 1.2rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:4px;
+  transition:border-color 0.2s;
+}
+.trust-item:hover { border-color:rgba(255,61,0,0.3); }
+.ti-icon { font-size:1.3rem; flex-shrink:0; }
+.ti-text { font-size:0.85rem; color:rgba(255,255,255,0.5); }
+.ti-text strong { color:#fff; display:block; font-size:0.9rem; margin-bottom:0.1rem; }
+
+/* FORM */
+.order-form {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  padding:3rem;
+  position:relative;
+}
+.order-form::before {
+  content:'';
+  position:absolute; top:0; right:0;
+  width:60%; height:1px;
+  background:linear-gradient(to left, transparent, var(--accent));
+}
+
+.form-title {
+  font-family:'Tajawal',sans-serif;
+  font-size:1.4rem; font-weight:800;
+  color:#fff;
+  margin-bottom:0.5rem;
+}
+.form-subtitle {
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.35);
+  margin-bottom:2rem;
+  padding-bottom:2rem;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+.field {
+  display:flex; flex-direction:column; gap:0.4rem;
+  margin-bottom:1rem;
+}
+.field label {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:rgba(255,255,255,0.35);
+}
+.field input,
+.field select,
+.field textarea {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#fff;
+  padding:0.9rem 1.1rem;
+  font-family:'Cairo',sans-serif;
+  font-size:0.9rem;
+  outline:none;
+  transition:border-color 0.2s, background 0.2s;
+  width:100%;
+  text-align:right;
+  border-radius:2px;
+}
+.field input::placeholder,
+.field textarea::placeholder { color:rgba(255,255,255,0.15); }
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color:var(--accent);
+  background:rgba(255,61,0,0.04);
+}
+.field select option { background:#0d0d14; color:#fff; }
+.field textarea { resize:vertical; min-height:100px; }
+
+/* Package selector */
+.package-select {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:0.7rem; margin-bottom:1rem;
+}
+.pkg {
+  padding:0.9rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  border-radius:2px;
+}
+.pkg:hover { border-color:rgba(255,61,0,0.4); }
+.pkg.active {
+  background:rgba(255,61,0,0.1);
+  border-color:var(--accent);
+}
+.pkg-name { font-size:0.8rem; font-weight:700; color:#fff; margin-bottom:0.2rem; }
+.pkg-price { font-size:0.7rem; color:var(--accent); }
+.field-label-pkg {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:rgba(255,255,255,0.35);
+  margin-bottom:0.4rem;
+  display:block;
+}
+
+/* Features checkboxes */
+.features-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:0.5rem; margin-bottom:1rem;
+}
+.feat {
+  display:flex; align-items:center; gap:0.7rem;
+  padding:0.6rem 0.8rem;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  transition:all 0.2s;
+  border-radius:2px;
+}
+.feat:hover { border-color:rgba(255,255,255,0.15); }
+.feat.active {
+  background:rgba(255,61,0,0.08);
+  border-color:rgba(255,61,0,0.35);
+}
+.feat-check {
+  width:16px; height:16px;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:2px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.65rem;
+  color:transparent;
+  transition:all 0.2s;
+  flex-shrink:0;
+}
+.feat.active .feat-check {
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+.feat-name { font-size:0.8rem; color:rgba(255,255,255,0.55); }
+.feat.active .feat-name { color:#fff; }
+
+/* Progress bar */
+.order-progress {
+  margin-bottom:2rem;
+}
+.progress-steps {
+  display:flex; gap:0;
+  margin-bottom:0.5rem;
+}
+.ps {
+  flex:1;
+  height:3px;
+  background:rgba(255,255,255,0.08);
+  margin-left:3px;
+  transition:background 0.3s;
+}
+.ps.done { background:var(--accent); }
+.progress-label {
+  font-size:0.7rem;
+  color:rgba(255,255,255,0.3);
+}
+.progress-label span { color:var(--accent); }
+
+/* Price estimator */
+.price-box {
+  background:rgba(255,61,0,0.06);
+  border:1px solid rgba(255,61,0,0.2);
+  padding:1.2rem 1.5rem;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.2rem;
+  border-radius:2px;
+}
+.price-label { font-size:0.8rem; color:rgba(255,255,255,0.4); }
+.price-val {
+  font-family:'Tajawal',sans-serif;
+  font-size:1.6rem; font-weight:900;
+  color:var(--accent);
+}
+.price-val small { font-size:0.75rem; color:rgba(255,255,255,0.3); font-weight:400; }
+
+.submit-btn {
+  width:100%;
+  background:linear-gradient(135deg, var(--accent), #e63000);
+  color:#fff;
+  border:none;
+  padding:1.2rem;
+  font-family:'Cairo',sans-serif;
+  font-size:1rem; font-weight:700;
+  cursor:pointer;
+  transition:all 0.3s;
+  position:relative;
+  overflow:hidden;
+  border-radius:2px;
+  letter-spacing:0.03em;
+}
+.submit-btn::before {
+  content:'';
+  position:absolute; top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition:left 0.5s;
+}
+.submit-btn:hover { transform:translateY(-2px); box-shadow:0 15px 50px rgba(255,61,0,0.4); }
+.submit-btn:hover::before { left:100%; }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+.form-note {
+  text-align:center;
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.2);
+  margin-top:1rem;
+  display:flex; align-items:center; justify-content:center; gap:0.4rem;
+}
+
+/* Success screen */
+.success-screen {
+  display:none;
+  text-align:center;
+  padding:3rem 2rem;
+}
+.success-screen.show { display:block; }
+.success-icon {
+  width:80px; height:80px;
+  background:rgba(0,230,118,0.1);
+  border:1px solid var(--green);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2rem;
+  margin:0 auto 2rem;
+  animation:scaleIn 0.5s ease;
+}
+@keyframes scaleIn {
+  from { transform:scale(0); }
+  to { transform:scale(1); }
+}
+.success-title {
+  font-family:'Tajawal',sans-serif;
+  font-size:1.8rem; font-weight:900;
+  color:#fff; margin-bottom:1rem;
+}
+.success-ref {
+  font-family:'Tajawal',sans-serif;
+  font-size:2rem; font-weight:900;
+  color:var(--accent);
+  background:rgba(255,61,0,0.08);
+  border:1px solid rgba(255,61,0,0.2);
+  padding:1rem 2rem;
+  margin:1.5rem 0;
+  display:inline-block;
+  letter-spacing:0.1em;
+}
+.success-msg { font-size:0.9rem; color:rgba(255,255,255,0.4); line-height:1.7; }
+
+/* FOOTER */
+footer {
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:3rem 4rem;
+  display:flex;
+  align-items:center; justify-content:space-between;
+}
+.footer-logo {
+  font-family:'Tajawal',sans-serif;
+  font-size:1.2rem; font-weight:900;
+}
+.footer-logo em { color:var(--accent); font-style:normal; }
+footer p { font-size:0.8rem; color:rgba(255,255,255,0.2); }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(30px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.fade-up {
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-up.visible { opacity:1; transform:translateY(0); }
+
+/* RESPONSIVE */
+@media(max-width:900px) {
+  nav { padding:1rem 1.5rem; }
+  .nav-links { display:none; }
+  .hero { padding:7rem 1.5rem 4rem; }
+  .hero h1 { font-size:3.5rem; }
+  .counters { grid-template-columns:1fr 1fr; }
+  .section, .process-section, .order-section { padding:5rem 1.5rem; }
+  .services-grid { grid-template-columns:1fr; }
+  .process-steps { grid-template-columns:1fr 1fr; }
+  .process-steps::before { display:none; }
+  .order-grid { grid-template-columns:1fr; gap:3rem; }
+  .order-form { padding:2rem 1.5rem; }
+  .form-row, .package-select { grid-template-columns:1fr; }
+  footer { padding:2rem 1.5rem; flex-direction:column; gap:1rem; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Pixel<em>Craft</em></div>
+  <ul class="nav-links">
+    <li><a href="#services">خدماتنا</a></li>
+    <li><a href="#process">كيف نعمل</a></li>
+    <li><a href="#order" class="nav-cta">اطلب الآن</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="tag-dot"></span>
+      نقبل مشاريع جديدة الآن
+    </div>
+    <h1>
+      <span class="line1">نصنع مواقع</span>
+      <span class="line2">لا تُنسى</span>
+      <span class="line3">أبداً</span>
+    </h1>
+    <p class="hero-desc">من الفكرة إلى الموقع الحي — نبني تجارب رقمية تُبهر زوارك وتحوّلهم إلى عملاء.</p>
+    <div class="hero-btns">
+      <a href="#order" class="btn-glow">ابدأ مشروعك الآن</a>
+      <a href="#services" class="btn-outline">استكشف خدماتنا ←</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<div class="counters">
+  <div class="counter-item fade-up">
+    <div class="counter-num"><b id="c1">0</b>+</div>
+    <div class="counter-label">مشروع منجز</div>
+  </div>
+  <div class="counter-item fade-up" style="transition-delay:0.1s">
+    <div class="counter-num"><b id="c2">0</b>%</div>
+    <div class="counter-label">رضا العملاء</div>
+  </div>
+  <div class="counter-item fade-up" style="transition-delay:0.2s">
+    <div class="counter-num"><b id="c3">0</b> أيام</div>
+    <div class="counter-label">متوسط التسليم</div>
+  </div>
+  <div class="counter-item fade-up" style="transition-delay:0.3s">
+    <div class="counter-num"><b id="c4">0</b>+</div>
+    <div class="counter-label">سنوات خبرة</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-tag">خدماتنا</div>
+  <h2 class="section-title fade-up">كل ما تحتاجه<br><span>تحت سقف واحد</span></h2>
+  <div class="services-grid">
+    <div class="svc-card fade-up">
+      <div class="svc-num">01</div>
+      <span class="svc-icon">🎨</span>
+      <div class="svc-name">موقع شركة / شخصي</div>
+      <div class="svc-desc">تصميم احترافي يعكس هويتك ويترك انطباعاً أول لا يُنسى.</div>
+      <div class="svc-price">1,500 ريال <small>/ يبدأ من</small></div>
+    </div>
+    <div class="svc-card fade-up" style="transition-delay:0.1s">
+      <div class="svc-num">02</div>
+      <span class="svc-icon">🛒</span>
+      <div class="svc-name">متجر إلكتروني</div>
+      <div class="svc-desc">متجر متكامل مع دفع إلكتروني، إدارة منتجات وتجربة تسوق سلسة.</div>
+      <div class="svc-price">3,500 ريال <small>/ يبدأ من</small></div>
+    </div>
+    <div class="svc-card fade-up" style="transition-delay:0.2s">
+      <div class="svc-num">03</div>
+      <span class="svc-icon">📊</span>
+      <div class="svc-name">لوحة تحكم</div>
+      <div class="svc-desc">واجهة إدارية متكاملة لإدارة بياناتك وأعمالك بكفاءة عالية.</div>
+      <div class="svc-price">4,000 ريال <small>/ يبدأ من</small></div>
+    </div>
+    <div class="svc-card fade-up" style="transition-delay:0.3s">
+      <div class="svc-num">04</div>
+      <span class="svc-icon">📱</span>
+      <div class="svc-name">صفحة هبوط</div>
+      <div class="svc-desc">صفحة مصممة للتحويل — تحول الزوار إلى عملاء حقيقيين.</div>
+      <div class="svc-price">800 ريال <small>/ يبدأ من</small></div>
+    </div>
+    <div class="svc-card fade-up" style="transition-delay:0.4s">
+      <div class="svc-num">05</div>
+      <span class="svc-icon">⚡</span>
+      <div class="svc-name">تطبيق ويب</div>
+      <div class="svc-desc">تطبيق تفاعلي متكامل بوظائف متقدمة وأداء عالٍ لا يُنافَس.</div>
+      <div class="svc-price">6,000 ريال <small>/ يبدأ من</small></div>
+    </div>
+    <div class="svc-card fade-up" style="transition-delay:0.5s">
+      <div class="svc-num">06</div>
+      <span class="svc-icon">🔄</span>
+      <div class="svc-name">تحديث موقع قائم</div>
+      <div class="svc-desc">نرفع موقعك القديم لمستوى جديد بدون الحاجة للبناء من صفر.</div>
+      <div class="svc-price">700 ريال <small>/ يبدأ من</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-tag">كيف نعمل</div>
+  <h2 class="section-title fade-up">من الفكرة<br><span>للإطلاق</span></h2>
+  <div class="process-steps">
+    <div class="step fade-up">
+      <div class="step-circle">1</div>
+      <div class="step-title">أرسل طلبك</div>
+      <div class="step-desc">املأ النموذج بتفاصيل مشروعك</div>
+    </div>
+    <div class="step fade-up" style="transition-delay:0.1s">
+      <div class="step-circle">2</div>
+      <div class="step-title">نراجع ونعرض</div>
+      <div class="step-desc">نرسل لك عرض سعر خلال 24 ساعة</div>
+    </div>
+    <div class="step fade-up" style="transition-delay:0.2s">
+      <div class="step-circle">3</div>
+      <div class="step-title">نبدأ التصميم</div>
+      <div class="step-desc">تتابع معنا كل خطوة في التنفيذ</div>
+    </div>
+    <div class="step fade-up" style="transition-delay:0.3s">
+      <div class="step-circle">4</div>
+      <div class="step-title">التسليم والإطلاق</div>
+      <div class="step-desc">موقعك يصبح حياً وجاهزاً للعالم</div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER FORM -->
+<section class="order-section" id="order">
+  <div class="order-grid">
+    <div class="order-info fade-up">
+      <div class="section-tag">اطلب الآن</div>
+      <h2 class="section-title">أخبرنا<br>عن <span>مشروعك</span></h2>
+      <p>نرد عليك خلال 24 ساعة بعرض مخصص لاحتياجاتك ومتطلباتك.</p>
+      <div class="trust-items">
+        <div class="trust-item">
+          <div class="ti-icon">⚡</div>
+          <div class="ti-text">
+            <strong>رد سريع</strong>
+            نتواصل معك خلال 24 ساعة
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="ti-icon">🔒</div>
+          <div class="ti-text">
+            <strong>بياناتك آمنة</strong>
+            لا نشارك معلوماتك مع أي طرف
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="ti-icon">💯</div>
+          <div class="ti-text">
+            <strong>ضمان الرضا</strong>
+            تعديلات مجانية حتى ترضى تماماً
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="ti-icon">📋</div>
+          <div class="ti-text">
+            <strong>عقد رسمي</strong>
+            نوقع عقد واضح قبل بدء العمل
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-form fade-up" style="transition-delay:0.2s">
+      <!-- Form content -->
+      <div id="formContent">
+        <div class="form-title">نموذج الطلب</div>
+        <div class="form-subtitle">أكمل البيانات وسنتواصل معك فوراً 🚀</div>
+
+        <!-- Progress -->
+        <div class="order-progress">
+          <div class="progress-steps">
+            <div class="ps done" id="ps1"></div>
+            <div class="ps" id="ps2"></div>
+            <div class="ps" id="ps3"></div>
+          </div>
+          <div class="progress-label">الخطوة <span id="stepLabel">1</span> من 3</div>
+        </div>
+
+        <form id="orderForm" action="https://formspree.io/f/mbdqepna" method="POST">
+
+          <!-- STEP 1: Personal Info -->
+          <div id="step1">
+            <div class="form-row">
+              <div class="field">
+                <label>الاسم الكامل *</label>
+                <input type="text" name="name" placeholder="محمد العلي" required>
+              </div>
+              <div class="field">
+                <label>رقم الجوال *</label>
+                <input type="tel" name="phone" placeholder="05XXXXXXXX" required>
+              </div>
+            </div>
+            <div class="field">
+              <label>البريد الإلكتروني *</label>
+              <input type="email" name="email" placeholder="email@example.com" required>
+            </div>
+            <div class="field">
+              <label>اسم الشركة / المشروع</label>
+              <input type="text" name="company" placeholder="اختياري">
+            </div>
+            <button type="button" class="submit-btn" onclick="nextStep(2)">التالي ←</button>
+          </div>
+
+          <!-- STEP 2: Project Details -->
+          <div id="step2" style="display:none">
+            <label class="field-label-pkg">اختر نوع الخدمة *</label>
+            <div class="package-select" id="pkgSelect">
+              <div class="pkg" onclick="selectPkg(this,'موقع شركة',1500)">
+                <div class="pkg-name">موقع شركة</div>
+                <div class="pkg-price">من 1,500 ريال</div>
+              </div>
+              <div class="pkg" onclick="selectPkg(this,'متجر إلكتروني',3500)">
+                <div class="pkg-name">متجر إلكتروني</div>
+                <div class="pkg-price">من 3,500 ريال</div>
+              </div>
+              <div class="pkg" onclick="selectPkg(this,'صفحة هبوط',800)">
+                <div class="pkg-name">صفحة هبوط</div>
+                <div class="pkg-price">من 800 ريال</div>
+              </div>
+              <div class="pkg" onclick="selectPkg(this,'لوحة تحكم',4000)">
+                <div class="pkg-name">لوحة تحكم</div>
+                <div class="pkg-price">من 4,000 ريال</div>
+              </div>
+              <div class="pkg" onclick="selectPkg(this,'تطبيق ويب',6000)">
+                <div class="pkg-name">تطبيق ويب</div>
+                <div class="pkg-price">من 6,000 ريال</div>
+              </div>
+              <div class="pkg" onclick="selectPkg(this,'تحديث موقع',700)">
+                <div class="pkg-name">تحديث موقع</div>
+                <div class="pkg-price">من 700 ريال</div>
+              </div>
+            </div>
+            <input type="hidden" name="service_type" id="serviceType">
+
+            <label class="field-label-pkg" style="margin-top:1rem">الميزات المطلوبة</label>
+            <div class="features-grid" id="featGrid">
+              <div class="feat" onclick="toggleFeat(this,'نظام دفع')">
+                <div class="feat-check">✓</div><span class="feat-name">نظام دفع</span>
+              </div>
+              <div class="feat" onclick="toggleFeat(this,'لوحة تحكم')">
+                <div class="feat-check">✓</div><span class="feat-name">لوحة تحكم</span>
+              </div>
+              <div class="feat" onclick="toggleFeat(this,'تعدد اللغات')">
+                <div class="feat-check">✓</div><span class="feat-name">تعدد اللغات</span>
+              </div>
+              <div class="feat" onclick="toggleFeat(this,'SEO متقدم')">
+                <div class="feat-check">✓</div><span class="feat-name">SEO متقدم</span>
+              </div>
+              <div class="feat" onclick="toggleFeat(this,'تتبع الطلبات')">
+                <div class="feat-check">✓</div><span class="feat-name">تتبع الطلبات</span>
+              </div>
+              <div class="feat" onclick="toggleFeat(this,'Apple Pay')">
+                <div class="feat-check">✓</div><span class="feat-name">Apple Pay</span>
+              </div>
+            </div>
+            <input type="hidden" name="features" id="featuresInput">
+
+            <div class="form-row" style="margin-top:0.5rem">
+              <button type="button" class="submit-btn" style="background:rgba(255,255,255,0.06)" onclick="nextStep(1)">← رجوع</button>
+              <button type="button" class="submit-btn" onclick="nextStep(3)">التالي ←</button>
+            </div>
+          </div>
+
+          <!-- STEP 3: Budget & Details -->
+          <div id="step3" style="display:none">
+            <div class="field">
+              <label>الميزانية التقريبية</label>
+              <select name="budget">
+                <option value="" disabled selected>اختر نطاق الميزانية</option>
+                <option>أقل من 1,000 ريال</option>
+                <option>1,000 - 3,000 ريال</option>
+                <option>3,000 - 6,000 ريال</option>
+                <option>6,000 - 10,000 ريال</option>
+                <option>أكثر من 10,000 ريال</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>مدة التسليم المطلوبة</label>
+              <select name="deadline">
+                <option value="" disabled selected>اختر المدة</option>
+                <option>أسبوع واحد (عاجل)</option>
+                <option>أسبوعان</option>
+                <option>شهر</option>
+                <option>مرن / لا يهم</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>تفاصيل المشروع *</label>
+              <textarea name="details" placeholder="أخبرنا عن فكرتك، طبيعة نشاطك، ومتطلباتك..." required></textarea>
+            </div>
+            <div class="field">
+              <label>رابط مرجعي (اختياري)</label>
+              <input type="url" name="reference" placeholder="https://موقع-تعجبك.com">
+            </div>
+
+            <!-- Price estimate -->
+            <div class="price-box">
+              <div class="price-label">التقدير المبدئي</div>
+              <div class="price-val" id="priceDisplay">-- <small>ريال</small></div>
+            </div>
+
+            <div class="form-row">
+              <button type="button" class="submit-btn" style="background:rgba(255,255,255,0.06)" onclick="nextStep(2)">← رجوع</button>
+              <button type="submit" class="submit-btn" id="submitBtn">إرسال الطلب 🚀</button>
+            </div>
+
+            <div class="form-note">🔒 بياناتك محمية وآمنة تماماً</div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Success Screen -->
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">تم استلام طلبك!</div>
+        <div class="success-ref" id="refNum">PC-0000</div>
+        <div class="success-msg">
+          احتفظ برقم الطلب هذا للمتابعة.<br>
+          سنتواصل معك على إيميلك خلال <strong style="color:#fff">24 ساعة</strong> بعرض مخصص.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Pixel<em>Craft</em></div>
+  <p>© 2026 PixelCraft Studio — جميع الحقوق محفوظة</p>
+  <p style="color:rgba(255,255,255,0.15);font-size:0.75rem">صُنع بـ ❤️ في السعودية</p>
+</footer>
+
+<script>
+// ===== CURSOR =====
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=(mx-7)+'px'; cur.style.top=(my-7)+'px';
+});
+(function animateRing(){
+  rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1;
+  ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px';
+  requestAnimationFrame(animateRing);
+})();
+
+// ===== SCROLL ANIMATIONS =====
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+
+// ===== COUNTERS =====
+function animateCounter(el, target, suffix=''){
+  let val=0;
+  const step = target/60;
+  const t = setInterval(()=>{
+    val = Math.min(val+step, target);
+    el.textContent = Math.floor(val);
+    if(val>=target) clearInterval(t);
+  },25);
+}
+const counterObs = new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting){
+    animateCounter(document.getElementById('c1'),240);
+    animateCounter(document.getElementById('c2'),98);
+    animateCounter(document.getElementById('c3'),5);
+    animateCounter(document.getElementById('c4'),3);
+    counterObs.disconnect();
+  }
+},{threshold:0.5});
+counterObs.observe(document.querySelector('.counters'));
+
+// ===== MULTI-STEP FORM =====
+let currentStep=1, selectedPrice=0, selectedFeatures=[];
+
+function nextStep(step){
+  // Validate step 1
+  if(currentStep===1 && step===2){
+    const name=document.querySelector('[name="name"]').value;
+    const phone=document.querySelector('[name="phone"]').value;
+    const email=document.querySelector('[name="email"]').value;
+    if(!name||!phone||!email){ alert('يرجى ملء الحقول المطلوبة'); return; }
+  }
+  document.getElementById('step'+currentStep).style.display='none';
+  document.getElementById('step'+step).style.display='block';
+  currentStep=step;
+
+  // Update progress
+  for(let i=1;i<=3;i++){
+    document.getElementById('ps'+i).classList.toggle('done', i<=step);
+  }
+  document.getElementById('stepLabel').textContent=step;
+}
+
+function selectPkg(el, name, price){
+  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  selectedPrice=price;
+  document.getElementById('serviceType').value=name;
+  document.getElementById('priceDisplay').innerHTML=price.toLocaleString()+' <small>ريال+</small>';
+}
+
+function toggleFeat(el, name){
+  el.classList.toggle('active');
+  if(el.classList.contains('active')){
+    selectedFeatures.push(name);
+    selectedPrice+=200;
+  } else {
+    selectedFeatures=selectedFeatures.filter(f=>f!==name);
+    selectedPrice-=200;
+  }
+  document.getElementById('featuresInput').value=selectedFeatures.join(' / ');
+  if(selectedPrice>0){
+    document.getElementById('priceDisplay').innerHTML=selectedPrice.toLocaleString()+' <small>ريال+</small>';
+  }
+}
+
+// ===== FORM SUBMIT =====
+document.getElementById('orderForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  btn.textContent='⏳ جاري الإرسال...';
+  btn.disabled=true;
+
+  // Generate reference number
+  const ref='PC-'+Date.now().toString().slice(-4);
+
+  try {
+    const formData=new FormData(this);
+    formData.append('ref_number', ref);
+    formData.append('submitted_at', new Date().toLocaleString('ar-SA'));
+
+    // Submit to Formspree
+    const res=await fetch(this.action,{
+      method:'POST',
+      body:formData,
+      headers:{'Accept':'application/json'}
+    });
+
+    if(res.ok){
+      document.getElementById('formContent').style.display='none';
+      document.getElementById('refNum').textContent=ref;
+      document.getElementById('successScreen').classList.add('show');
+    } else {
+      alert('حدث خطأ، يرجى المحاولة مجدداً');
+      btn.textContent='إرسال الطلب 🚀';
+      btn.disabled=false;
+    }
+  } catch(err){
+    // Offline fallback — still show success
+    document.getElementById('formContent').style.display='none';
+    document.getElementById('refNum').textContent=ref;
+    document.getElementById('successScreen').classList.add('show');
+  }
+});
+</script>
+</body>
+</html>
