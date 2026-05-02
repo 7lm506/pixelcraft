@@ -3,1254 +3,2216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PixelCraft Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+<title>HeuMed Partners - شريك تطوير وتشغيل المنظومات الصحية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   VARIABLES & RESET
+   ============================================================ */
 :root {
-  --bg: #080810;
-  --paper: #f5f0e8;
-  --accent: #ff3d00;
-  --gold: #f0c040;
-  --blue: #0066ff;
-  --green: #00e676;
-  --white: #ffffff;
+  --navy:       #062B49;
+  --navy-deep:  #021A31;
+  --teal:       #00AFAF;
+  --teal-light: #E8FAFA;
+  --bg:         #F7FAFC;
+  --gray-text:  #677789;
+  --white:      #ffffff;
+  --border:     #DDE6EE;
+  --card-bg:    #ffffff;
+  --nav-h:      68px;
+  --radius:     14px;
+  --radius-sm:  8px;
+  --shadow:     0 2px 20px rgba(6,43,73,.08);
+  --shadow-md:  0 6px 32px rgba(6,43,73,.12);
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--white);
-  font-family: 'Cairo', sans-serif;
-  overflow-x: hidden;
-  cursor: none;
-}
-
-/* ===== CURSOR ===== */
-#cur {
-  width:14px; height:14px;
-  background:var(--accent);
-  border-radius:50%;
-  position:fixed;
-  pointer-events:none;
-  z-index:9999;
-  transition:transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-  mix-blend-mode:screen;
-}
-#cur-ring {
-  width:44px; height:44px;
-  border:1.5px solid rgba(255,255,255,0.3);
-  border-radius:50%;
-  position:fixed;
-  pointer-events:none;
-  z-index:9998;
-  transition:all 0.35s cubic-bezier(0.23,1,0.32,1);
-}
-body:has(a:hover) #cur,
-body:has(button:hover) #cur { transform:scale(3); background:var(--gold); }
-
-/* ===== NOISE OVERLAY ===== */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;
-  z-index:1000;
-  opacity:0.4;
-}
-
-/* ===== NAV ===== */
-nav {
-  position:fixed; top:0; left:0; right:0;
-  padding:1.5rem 4rem;
-  display:flex; align-items:center; justify-content:space-between;
-  z-index:500;
-  background:linear-gradient(to bottom, rgba(8,8,16,0.9), transparent);
-  backdrop-filter:blur(10px);
-}
-.logo {
-  font-family:'Tajawal',sans-serif;
-  font-weight:900; font-size:1.5rem;
-  letter-spacing:-0.02em;
-}
-.logo em { color:var(--accent); font-style:normal; }
-.nav-links { display:flex; gap:2.5rem; list-style:none; }
-.nav-links a {
-  color:rgba(255,255,255,0.5);
-  text-decoration:none;
-  font-size:0.85rem;
-  font-weight:600;
-  transition:color 0.2s;
-}
-.nav-links a:hover { color:#fff; }
-.nav-cta {
-  background:var(--accent);
-  color:#fff !important;
-  padding:0.5rem 1.4rem !important;
-  font-weight:700 !important;
-  transition:background 0.2s, transform 0.2s !important;
-}
-.nav-cta:hover { background:#e63000 !important; transform:translateY(-2px); }
-
-/* ===== HERO ===== */
-.hero {
-  min-height:100vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  text-align:center;
-  padding:8rem 2rem 4rem;
-  position:relative;
-  overflow:hidden;
-}
-
-/* Animated gradient bg */
-.hero-bg {
-  position:absolute; inset:-50%;
-  background: conic-gradient(from 0deg at 50% 50%,
-    #080810 0deg,
-    #0d0820 60deg,
-    #080810 120deg,
-    #0f0510 180deg,
-    #080810 240deg,
-    #08100f 300deg,
-    #080810 360deg);
-  animation: rotateBg 20s linear infinite;
-  filter: blur(80px);
-}
-@keyframes rotateBg {
-  from { transform:rotate(0deg); }
-  to { transform:rotate(360deg); }
-}
-
-/* Grid lines */
-.hero-grid {
-  position:absolute; inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size:60px 60px;
-}
-
-/* Floating orbs */
-.orb {
-  position:absolute;
-  border-radius:50%;
-  filter:blur(80px);
-  animation:orbFloat 8s ease-in-out infinite;
-  pointer-events:none;
-}
-.orb1 { width:400px; height:400px; background:rgba(255,61,0,0.12); top:10%; right:15%; animation-delay:0s; }
-.orb2 { width:300px; height:300px; background:rgba(0,102,255,0.1); bottom:20%; left:10%; animation-delay:3s; }
-.orb3 { width:200px; height:200px; background:rgba(240,192,64,0.08); top:50%; left:40%; animation-delay:5s; }
-
-@keyframes orbFloat {
-  0%,100% { transform:translateY(0) scale(1); }
-  50% { transform:translateY(-40px) scale(1.05); }
-}
-
-.hero-content { position:relative; z-index:2; }
-
-.hero-tag {
-  display:inline-flex; align-items:center; gap:0.6rem;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
-  padding:0.4rem 1.2rem;
-  border-radius:50px;
-  font-size:0.75rem;
-  font-weight:700;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,0.6);
-  margin-bottom:2rem;
-  backdrop-filter:blur(10px);
-}
-.tag-dot {
-  width:7px; height:7px;
-  background:var(--green);
-  border-radius:50%;
-  box-shadow:0 0 10px var(--green);
-  animation:pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:0.5; transform:scale(0.7); }
-}
-
-.hero h1 {
-  font-family:'Tajawal',sans-serif;
-  font-size:clamp(3.5rem, 9vw, 8rem);
-  font-weight:900;
-  line-height:0.95;
-  letter-spacing:-0.04em;
-  margin-bottom:1.5rem;
-}
-.hero h1 .line1 { display:block; color:#fff; }
-.hero h1 .line2 {
-  display:block;
-  background:linear-gradient(135deg, var(--accent), var(--gold));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.hero h1 .line3 { display:block; color:rgba(255,255,255,0.2); }
-
-.hero-desc {
-  font-size:1.1rem;
-  line-height:1.8;
-  color:rgba(255,255,255,0.5);
-  max-width:520px;
-  margin:0 auto 3rem;
-}
-
-.hero-btns {
-  display:flex; gap:1rem;
-  justify-content:center; align-items:center;
-  flex-wrap:wrap;
-}
-
-.btn-glow {
-  position:relative;
-  background:var(--accent);
-  color:#fff;
-  padding:1.1rem 3rem;
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
   font-family:'Cairo',sans-serif;
-  font-size:1rem;
-  font-weight:700;
-  border:none;
-  cursor:pointer;
-  text-decoration:none;
-  display:inline-block;
-  overflow:hidden;
-  transition:transform 0.3s, box-shadow 0.3s;
-  clip-path:polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-}
-.btn-glow::before {
-  content:'';
-  position:absolute; top:0; left:-100%;
-  width:100%; height:100%;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition:left 0.5s;
-}
-.btn-glow:hover { transform:translateY(-3px); box-shadow:0 20px 60px rgba(255,61,0,0.4); }
-.btn-glow:hover::before { left:100%; }
-
-.btn-outline {
-  color:rgba(255,255,255,0.7);
-  font-size:0.9rem;
-  font-weight:600;
-  text-decoration:none;
-  display:flex; align-items:center; gap:0.5rem;
-  transition:color 0.2s;
-}
-.btn-outline:hover { color:#fff; }
-
-/* Scroll indicator */
-.scroll-hint {
-  position:absolute;
-  bottom:2rem; left:50%;
-  transform:translateX(-50%);
-  display:flex; flex-direction:column; align-items:center;
-  gap:0.5rem;
-  color:rgba(255,255,255,0.2);
-  font-size:0.7rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  animation:fadeUp 2s 2s both;
-}
-.scroll-line {
-  width:1px; height:50px;
-  background:linear-gradient(to bottom, transparent, rgba(255,255,255,0.2));
-  animation:scrollPulse 2s ease-in-out infinite;
-}
-@keyframes scrollPulse {
-  0%,100% { transform:scaleY(1); opacity:1; }
-  50% { transform:scaleY(0.5); opacity:0.5; }
-}
-
-/* Counters strip */
-.counters {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  border-top:1px solid rgba(255,255,255,0.06);
-  border-bottom:1px solid rgba(255,255,255,0.06);
-}
-.counter-item {
-  padding:3rem 2rem;
-  text-align:center;
-  border-left:1px solid rgba(255,255,255,0.06);
-  position:relative;
-  overflow:hidden;
-  transition:background 0.3s;
-}
-.counter-item:first-child { border-left:none; }
-.counter-item:hover { background:rgba(255,255,255,0.02); }
-.counter-num {
-  font-family:'Tajawal',sans-serif;
-  font-size:3rem; font-weight:900;
-  background:linear-gradient(135deg,#fff,rgba(255,255,255,0.5));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-  line-height:1;
-}
-.counter-num b { color:var(--accent); -webkit-text-fill-color:var(--accent); }
-.counter-label { font-size:0.8rem; color:rgba(255,255,255,0.35); margin-top:0.5rem; }
-
-/* ===== SERVICES ===== */
-.section {
-  padding:8rem 4rem;
-  position:relative;
-}
-.section-tag {
-  display:inline-flex; align-items:center; gap:0.5rem;
-  font-size:0.7rem; font-weight:700;
-  letter-spacing:0.15em; text-transform:uppercase;
-  color:var(--accent);
-  margin-bottom:1rem;
-}
-.section-tag::before { content:''; width:24px; height:2px; background:var(--accent); }
-.section-title {
-  font-family:'Tajawal',sans-serif;
-  font-size:clamp(2rem,4vw,3.5rem);
-  font-weight:900;
-  line-height:1.05;
-  letter-spacing:-0.03em;
-  margin-bottom:4rem;
-  color:#fff;
-}
-.section-title span { color:var(--accent); }
-
-.services-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.06);
-}
-.svc-card {
+  color:var(--navy);
   background:var(--bg);
-  padding:3rem 2.5rem;
-  position:relative;
-  overflow:hidden;
-  transition:background 0.3s;
-  cursor:pointer;
+  direction:rtl;
+  overflow-x:hidden;
 }
-.svc-card::before {
-  content:'';
-  position:absolute; bottom:0; right:0;
-  width:0; height:2px;
-  background:linear-gradient(to left, var(--accent), transparent);
-  transition:width 0.5s;
-}
-.svc-card:hover { background:#0f0f1a; }
-.svc-card:hover::before { width:100%; }
+a,button{cursor:pointer;font-family:'Cairo',sans-serif}
+img{max-width:100%;display:block}
 
-.svc-num {
-  font-family:'Tajawal',sans-serif;
-  font-size:4rem; font-weight:900;
-  color:rgba(255,255,255,0.04);
-  position:absolute; top:1rem; left:1.5rem;
-  line-height:1;
-  transition:color 0.3s;
-}
-.svc-card:hover .svc-num { color:rgba(255,61,0,0.08); }
-
-.svc-icon {
-  font-size:2.2rem;
-  margin-bottom:1.5rem;
-  display:block;
-  position:relative;
-  z-index:1;
-}
-.svc-name {
-  font-family:'Tajawal',sans-serif;
-  font-size:1.2rem; font-weight:700;
-  color:#fff;
-  margin-bottom:0.8rem;
-  position:relative; z-index:1;
-}
-.svc-desc {
-  font-size:0.88rem;
-  line-height:1.7;
-  color:rgba(255,255,255,0.4);
-  position:relative; z-index:1;
-}
-.svc-price {
-  margin-top:2rem;
-  font-family:'Tajawal',sans-serif;
-  font-size:1.6rem; font-weight:900;
-  color:var(--accent);
-  position:relative; z-index:1;
-}
-.svc-price small {
-  font-size:0.75rem; font-weight:400;
-  color:rgba(255,255,255,0.25);
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:var(--navy-deep);
+  height:var(--nav-h);
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 40px;
+  border-bottom:1px solid rgba(255,255,255,.06);
 }
 
-/* ===== PROCESS ===== */
-.process-section {
-  padding:8rem 4rem;
-  background:rgba(255,255,255,0.015);
-}
-.process-steps {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:0;
-  margin-top:4rem;
-  position:relative;
-}
-.process-steps::before {
-  content:'';
-  position:absolute;
-  top:2.5rem; right:12.5%; left:12.5%;
-  height:1px;
-  background:linear-gradient(to left, transparent, rgba(255,61,0,0.4), transparent);
-}
-.step {
-  text-align:center;
-  padding:0 1.5rem;
-  position:relative;
-}
-.step-circle {
-  width:50px; height:50px;
-  border-radius:50%;
-  background:var(--bg);
-  border:1px solid rgba(255,61,0,0.4);
-  display:flex; align-items:center; justify-content:center;
-  margin:0 auto 1.5rem;
-  font-family:'Tajawal',sans-serif;
-  font-size:1.1rem; font-weight:900;
-  color:var(--accent);
-  position:relative; z-index:1;
-  transition:background 0.3s, box-shadow 0.3s;
-}
-.step:hover .step-circle {
-  background:var(--accent);
-  color:#fff;
-  box-shadow:0 0 30px rgba(255,61,0,0.5);
-}
-.step-title {
-  font-family:'Tajawal',sans-serif;
-  font-size:1rem; font-weight:700;
-  color:#fff;
-  margin-bottom:0.5rem;
-}
-.step-desc { font-size:0.82rem; color:rgba(255,255,255,0.4); line-height:1.6; }
-
-/* ===== ORDER FORM ===== */
-.order-section {
-  padding:8rem 4rem;
-  position:relative;
-  overflow:hidden;
-}
-.order-section::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0; bottom:0;
-  background:radial-gradient(ellipse at 70% 50%, rgba(255,61,0,0.05) 0%, transparent 70%);
-  pointer-events:none;
-}
-
-.order-grid {
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:6rem;
-  align-items:start;
-  position:relative; z-index:1;
-}
-
-.order-info .section-title { margin-bottom:1.5rem; }
-.order-info p {
-  font-size:0.95rem;
-  line-height:1.8;
-  color:rgba(255,255,255,0.4);
-  margin-bottom:2.5rem;
-}
-
-.trust-items {
-  display:flex; flex-direction:column; gap:1rem;
-}
-.trust-item {
-  display:flex; align-items:center; gap:1rem;
-  padding:1rem 1.2rem;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:4px;
-  transition:border-color 0.2s;
-}
-.trust-item:hover { border-color:rgba(255,61,0,0.3); }
-.ti-icon { font-size:1.3rem; flex-shrink:0; }
-.ti-text { font-size:0.85rem; color:rgba(255,255,255,0.5); }
-.ti-text strong { color:#fff; display:block; font-size:0.9rem; margin-bottom:0.1rem; }
-
-/* FORM */
-.order-form {
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.07);
-  padding:3rem;
-  position:relative;
-}
-.order-form::before {
-  content:'';
-  position:absolute; top:0; right:0;
-  width:60%; height:1px;
-  background:linear-gradient(to left, transparent, var(--accent));
-}
-
-.form-title {
-  font-family:'Tajawal',sans-serif;
-  font-size:1.4rem; font-weight:800;
-  color:#fff;
-  margin-bottom:0.5rem;
-}
-.form-subtitle {
-  font-size:0.82rem;
-  color:rgba(255,255,255,0.35);
-  margin-bottom:2rem;
-  padding-bottom:2rem;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-}
-
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-
-.field {
-  display:flex; flex-direction:column; gap:0.4rem;
-  margin-bottom:1rem;
-}
-.field label {
-  font-size:0.7rem; font-weight:700;
-  letter-spacing:0.1em; text-transform:uppercase;
-  color:rgba(255,255,255,0.35);
-}
-.field input,
-.field select,
-.field textarea {
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  color:#fff;
-  padding:0.9rem 1.1rem;
-  font-family:'Cairo',sans-serif;
-  font-size:0.9rem;
-  outline:none;
-  transition:border-color 0.2s, background 0.2s;
-  width:100%;
-  text-align:right;
-  border-radius:2px;
-}
-.field input::placeholder,
-.field textarea::placeholder { color:rgba(255,255,255,0.15); }
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
-  border-color:var(--accent);
-  background:rgba(255,61,0,0.04);
-}
-.field select option { background:#0d0d14; color:#fff; }
-.field textarea { resize:vertical; min-height:100px; }
-
-/* Package selector */
-.package-select {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:0.7rem; margin-bottom:1rem;
-}
-.pkg {
-  padding:0.9rem;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);
-  text-align:center;
-  cursor:pointer;
-  transition:all 0.2s;
-  border-radius:2px;
-}
-.pkg:hover { border-color:rgba(255,61,0,0.4); }
-.pkg.active {
-  background:rgba(255,61,0,0.1);
-  border-color:var(--accent);
-}
-.pkg-name { font-size:0.8rem; font-weight:700; color:#fff; margin-bottom:0.2rem; }
-.pkg-price { font-size:0.7rem; color:var(--accent); }
-.field-label-pkg {
-  font-size:0.7rem; font-weight:700;
-  letter-spacing:0.1em; text-transform:uppercase;
-  color:rgba(255,255,255,0.35);
-  margin-bottom:0.4rem;
-  display:block;
-}
-
-/* Features checkboxes */
-.features-grid {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:0.5rem; margin-bottom:1rem;
-}
-.feat {
-  display:flex; align-items:center; gap:0.7rem;
-  padding:0.6rem 0.8rem;
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
-  transition:all 0.2s;
-  border-radius:2px;
-}
-.feat:hover { border-color:rgba(255,255,255,0.15); }
-.feat.active {
-  background:rgba(255,61,0,0.08);
-  border-color:rgba(255,61,0,0.35);
-}
-.feat-check {
-  width:16px; height:16px;
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:2px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:0.65rem;
-  color:transparent;
-  transition:all 0.2s;
+/* Logo */
+.logo{
+  display:flex;align-items:center;
+  text-decoration:none;cursor:pointer;
   flex-shrink:0;
 }
-.feat.active .feat-check {
-  background:var(--accent);
-  border-color:var(--accent);
-  color:#fff;
-}
-.feat-name { font-size:0.8rem; color:rgba(255,255,255,0.55); }
-.feat.active .feat-name { color:#fff; }
+.logo svg{height:38px;width:auto}
 
-/* Progress bar */
-.order-progress {
-  margin-bottom:2rem;
+/* Desktop nav links */
+.nav-links{
+  display:flex;align-items:center;gap:32px;list-style:none;
 }
-.progress-steps {
-  display:flex; gap:0;
-  margin-bottom:0.5rem;
+.nav-links a{
+  text-decoration:none;color:rgba(255,255,255,.75);
+  font-size:14px;font-weight:500;
+  transition:color .2s;padding:4px 0;
+  border-bottom:2px solid transparent;
 }
-.ps {
-  flex:1;
-  height:3px;
-  background:rgba(255,255,255,0.08);
-  margin-left:3px;
-  transition:background 0.3s;
-}
-.ps.done { background:var(--accent); }
-.progress-label {
-  font-size:0.7rem;
-  color:rgba(255,255,255,0.3);
-}
-.progress-label span { color:var(--accent); }
+.nav-links a:hover,.nav-links a.active{color:var(--white);border-bottom-color:var(--teal)}
 
-/* Price estimator */
-.price-box {
-  background:rgba(255,61,0,0.06);
-  border:1px solid rgba(255,61,0,0.2);
-  padding:1.2rem 1.5rem;
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:1.2rem;
-  border-radius:2px;
+/* CTA button */
+.btn-nav{
+  background:var(--teal);color:var(--white);
+  border:none;border-radius:var(--radius-sm);
+  padding:9px 20px;font-size:13px;font-weight:700;
+  transition:background .2s;white-space:nowrap;
 }
-.price-label { font-size:0.8rem; color:rgba(255,255,255,0.4); }
-.price-val {
-  font-family:'Tajawal',sans-serif;
-  font-size:1.6rem; font-weight:900;
-  color:var(--accent);
-}
-.price-val small { font-size:0.75rem; color:rgba(255,255,255,0.3); font-weight:400; }
+.btn-nav:hover{background:#009999}
 
-.submit-btn {
-  width:100%;
-  background:linear-gradient(135deg, var(--accent), #e63000);
-  color:#fff;
-  border:none;
-  padding:1.2rem;
-  font-family:'Cairo',sans-serif;
-  font-size:1rem; font-weight:700;
-  cursor:pointer;
-  transition:all 0.3s;
-  position:relative;
+/* Hamburger */
+.hamburger{
+  display:none;background:none;border:none;
+  flex-direction:column;gap:5px;padding:6px;
+}
+.hamburger span{
+  display:block;width:22px;height:2px;
+  background:var(--white);border-radius:2px;
+  transition:all .3s;
+}
+
+/* Mobile menu */
+.mobile-menu{
+  display:none;position:fixed;
+  top:var(--nav-h);left:0;right:0;
+  background:var(--navy-deep);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  z-index:999;padding:8px 0 16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.mobile-menu.open{display:block}
+.mobile-menu a{
+  display:block;padding:13px 24px;
+  color:rgba(255,255,255,.8);font-size:15px;font-weight:500;
+  text-decoration:none;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu a:hover{color:var(--teal);background:rgba(255,255,255,.04)}
+.mobile-menu .m-cta{
+  margin:12px 24px 0;display:block;
+  background:var(--teal);color:var(--white)!important;
+  text-align:center;border-radius:var(--radius-sm);
+  padding:12px;font-weight:700;
+}
+
+/* ============================================================
+   PAGE SYSTEM
+   ============================================================ */
+.page{display:none;padding-top:var(--nav-h);min-height:100vh}
+.page.active{display:block}
+
+/* ============================================================
+   HERO SECTION (shared across pages)
+   ============================================================ */
+.hero{
+  background:var(--navy);
+  color:var(--white);
+  padding:0;
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:0;
+  min-height:430px;
+  align-items:stretch;
   overflow:hidden;
-  border-radius:2px;
-  letter-spacing:0.03em;
-}
-.submit-btn::before {
-  content:'';
-  position:absolute; top:0; left:-100%;
-  width:100%; height:100%;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-  transition:left 0.5s;
-}
-.submit-btn:hover { transform:translateY(-2px); box-shadow:0 15px 50px rgba(255,61,0,0.4); }
-.submit-btn:hover::before { left:100%; }
-.submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-
-.form-note {
-  text-align:center;
-  font-size:0.75rem;
-  color:rgba(255,255,255,0.2);
-  margin-top:1rem;
-  display:flex; align-items:center; justify-content:center; gap:0.4rem;
+  position:relative;
 }
 
-/* Success screen */
-.success-screen {
-  display:none;
-  text-align:center;
-  padding:3rem 2rem;
-}
-.success-screen.show { display:block; }
-.success-icon {
-  width:80px; height:80px;
-  background:rgba(0,230,118,0.1);
-  border:1px solid var(--green);
+/* Background decorative circles */
+.hero::before{
+  content:'';position:absolute;
+  width:500px;height:500px;
   border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:2rem;
-  margin:0 auto 2rem;
-  animation:scaleIn 0.5s ease;
+  background:radial-gradient(circle,rgba(0,175,175,.1) 0%,transparent 70%);
+  top:-100px;left:-100px;
+  pointer-events:none;
 }
-@keyframes scaleIn {
-  from { transform:scale(0); }
-  to { transform:scale(1); }
-}
-.success-title {
-  font-family:'Tajawal',sans-serif;
-  font-size:1.8rem; font-weight:900;
-  color:#fff; margin-bottom:1rem;
-}
-.success-ref {
-  font-family:'Tajawal',sans-serif;
-  font-size:2rem; font-weight:900;
-  color:var(--accent);
-  background:rgba(255,61,0,0.08);
-  border:1px solid rgba(255,61,0,0.2);
-  padding:1rem 2rem;
-  margin:1.5rem 0;
-  display:inline-block;
-  letter-spacing:0.1em;
-}
-.success-msg { font-size:0.9rem; color:rgba(255,255,255,0.4); line-height:1.7; }
-
-/* FOOTER */
-footer {
-  border-top:1px solid rgba(255,255,255,0.06);
-  padding:3rem 4rem;
-  display:flex;
-  align-items:center; justify-content:space-between;
-}
-.footer-logo {
-  font-family:'Tajawal',sans-serif;
-  font-size:1.2rem; font-weight:900;
-}
-.footer-logo em { color:var(--accent); font-style:normal; }
-footer p { font-size:0.8rem; color:rgba(255,255,255,0.2); }
-
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(30px); }
-  to { opacity:1; transform:translateY(0); }
+.hero::after{
+  content:'';position:absolute;
+  width:300px;height:300px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,175,175,.08) 0%,transparent 70%);
+  bottom:-50px;right:300px;
+  pointer-events:none;
 }
 
-.fade-up {
-  opacity:0;
-  transform:translateY(30px);
-  transition:opacity 0.7s ease, transform 0.7s ease;
+.hero-content{
+  padding:56px 56px 56px 40px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  position:relative;z-index:1;
 }
-.fade-up.visible { opacity:1; transform:translateY(0); }
 
-/* RESPONSIVE */
-@media(max-width:900px) {
-  nav { padding:1rem 1.5rem; }
-  .nav-links { display:none; }
-  .hero { padding:7rem 1.5rem 4rem; }
-  .hero h1 { font-size:3.5rem; }
-  .counters { grid-template-columns:1fr 1fr; }
-  .section, .process-section, .order-section { padding:5rem 1.5rem; }
-  .services-grid { grid-template-columns:1fr; }
-  .process-steps { grid-template-columns:1fr 1fr; }
-  .process-steps::before { display:none; }
-  .order-grid { grid-template-columns:1fr; gap:3rem; }
-  .order-form { padding:2rem 1.5rem; }
-  .form-row, .package-select { grid-template-columns:1fr; }
-  footer { padding:2rem 1.5rem; flex-direction:column; gap:1rem; text-align:center; }
+.hero-content h1{
+  font-size:clamp(30px,4vw,52px);
+  font-weight:800;
+  line-height:1.25;
+  margin-bottom:16px;
 }
+.hero-content h1 .teal{color:var(--teal)}
+.hero-content h1 .block{display:block}
+
+.hero-content p{
+  font-size:15px;
+  color:rgba(255,255,255,.72);
+  line-height:1.75;
+  max-width:480px;
+  margin-bottom:28px;
+}
+
+.hero-badges{
+  display:flex;align-items:center;gap:20px;
+  margin-top:16px;flex-wrap:wrap;
+}
+.hero-badge-item{
+  display:flex;align-items:center;gap:6px;
+  color:rgba(255,255,255,.65);font-size:13px;font-weight:500;
+}
+.hero-badge-item::before{content:'•';color:var(--teal);font-size:18px}
+
+/* Hero visual (right column) */
+.hero-visual{
+  background:rgba(255,255,255,.04);
+  border-right:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  padding:40px;
+  position:relative;z-index:1;
+}
+
+.hero-card{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:16px;
+  padding:24px;
+  width:100%;max-width:320px;
+}
+.hero-card-top{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;margin-bottom:16px;
+}
+.hero-card-box{
+  background:rgba(255,255,255,.1);
+  border-radius:8px;height:50px;
+}
+.hero-card-label{
+  background:rgba(255,255,255,.12);
+  border-radius:8px;padding:10px 16px;
+  text-align:center;color:var(--white);
+  font-size:15px;font-weight:700;margin-bottom:16px;
+}
+.hero-card-btn{
+  background:var(--teal);
+  border-radius:8px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary{
+  background:var(--teal);color:var(--white);
+  border:none;border-radius:var(--radius-sm);
+  padding:12px 24px;font-size:14px;font-weight:700;
+  transition:background .2s;display:inline-block;
+  text-decoration:none;white-space:nowrap;
+}
+.btn-primary:hover{background:#009999}
+
+.btn-outline{
+  background:transparent;color:var(--white);
+  border:1.5px solid rgba(255,255,255,.4);
+  border-radius:var(--radius-sm);
+  padding:11px 24px;font-size:14px;font-weight:600;
+  transition:all .2s;display:inline-block;
+  text-decoration:none;white-space:nowrap;
+}
+.btn-outline:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.7)}
+
+.btn-outline-navy{
+  background:transparent;color:var(--navy);
+  border:1.5px solid var(--navy);
+  border-radius:var(--radius-sm);
+  padding:11px 24px;font-size:14px;font-weight:600;
+  transition:all .2s;display:inline-block;
+  text-decoration:none;
+}
+.btn-outline-navy:hover{background:var(--navy);color:var(--white)}
+
+.btns-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* ============================================================
+   SECTION WRAPPER
+   ============================================================ */
+.section{padding:72px 60px}
+.section-sm{padding:48px 60px}
+.section-white{background:var(--white)}
+.section-bg{background:var(--bg)}
+.section-navy{background:var(--navy);color:var(--white)}
+.section-navy-deep{background:var(--navy-deep);color:var(--white)}
+
+.section-header{text-align:center;margin-bottom:48px}
+.section-header h2{
+  font-size:clamp(22px,3vw,34px);
+  font-weight:800;color:var(--navy);
+  margin-bottom:8px;
+}
+.section-navy .section-header h2,
+.section-navy-deep .section-header h2{color:var(--white)}
+
+.section-header p{
+  font-size:15px;color:var(--gray-text);
+  line-height:1.7;max-width:600px;margin:0 auto;
+}
+.section-navy .section-header p,
+.section-navy-deep .section-header p{color:rgba(255,255,255,.65)}
+
+/* Underline decoration */
+.underline-teal{
+  width:48px;height:3px;
+  background:var(--teal);
+  border-radius:2px;
+  margin:12px auto 0;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cards-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cards-5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+
+.card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px 24px;
+  transition:box-shadow .2s,transform .2s;
+}
+.card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+
+.card-icon{
+  width:46px;height:46px;
+  background:var(--teal-light);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;color:var(--teal);font-size:20px;
+}
+
+.card h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.card p{font-size:13px;color:var(--gray-text);line-height:1.65}
+.card-link{
+  display:inline-block;margin-top:14px;
+  font-size:13px;font-weight:700;color:var(--teal);
+  text-decoration:none;
+}
+.card-link:hover{text-decoration:underline}
+
+/* Dark cards (navy background) */
+.card-dark{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+}
+.card-dark h3{color:var(--white)}
+.card-dark p{color:rgba(255,255,255,.6)}
+.card-dark .card-icon{background:rgba(0,175,175,.15);color:var(--teal)}
+
+/* ============================================================
+   CTA BANNER
+   ============================================================ */
+.cta-banner{
+  background:var(--navy);
+  border-radius:var(--radius);
+  padding:52px 60px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:32px;align-items:center;
+}
+.cta-banner h2{font-size:24px;font-weight:800;color:var(--white);margin-bottom:10px}
+.cta-banner p{font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:560px}
+.cta-banner-btns{display:flex;gap:12px;align-items:center;flex-shrink:0}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  background:var(--navy-deep);
+  color:var(--white);
+  padding:56px 60px 28px;
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr 1fr;
+  gap:48px;margin-bottom:40px;
+}
+.footer-brand .logo{margin-bottom:16px}
+.footer-brand p{
+  font-size:13px;color:rgba(255,255,255,.5);
+  line-height:1.7;max-width:260px;
+}
+.footer-col h4{
+  font-size:14px;font-weight:700;
+  color:var(--white);margin-bottom:16px;
+}
+.footer-col a,.footer-col span{
+  display:block;font-size:13px;
+  color:rgba(255,255,255,.5);
+  text-decoration:none;margin-bottom:8px;
+  transition:color .2s;
+}
+.footer-col a:hover{color:var(--teal)}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:20px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:8px;
+}
+
+/* ============================================================
+   CHECK ITEMS
+   ============================================================ */
+.check-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px 18px;margin-bottom:10px;
+}
+.check-item:last-child{margin-bottom:0}
+.check-icon{
+  width:26px;height:26px;flex-shrink:0;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;margin-top:2px;
+}
+.check-icon.yes{background:var(--teal);color:var(--white)}
+.check-icon.no{background:#FEE2E2;color:#EF4444}
+.check-item h4{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.check-item p{font-size:13px;color:var(--gray-text);line-height:1.5}
+
+/* ============================================================
+   COMPARE TABLE
+   ============================================================ */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.compare-box{border-radius:var(--radius);padding:32px 28px}
+.compare-box.trad{background:var(--white);border:1px solid var(--border)}
+.compare-box.heu{background:var(--teal-light);border:1px solid rgba(0,175,175,.25)}
+.compare-box h3{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:20px;text-align:center}
+
+/* ============================================================
+   STEPS / METHOD
+   ============================================================ */
+.steps-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.step-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px 20px;
+}
+.step-num{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--teal);color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;margin-bottom:14px;
+}
+.step-card h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.step-card p{font-size:13px;color:var(--gray-text);line-height:1.6}
+
+/* ============================================================
+   DELIVERABLES
+   ============================================================ */
+.deliverables-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.del-item{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:18px 16px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;text-align:center;
+}
+.del-item .check-icon{margin-top:0;flex-shrink:0}
+.del-item p{font-size:13px;font-weight:600;color:var(--navy)}
+
+/* ============================================================
+   SECTORS GRID
+   ============================================================ */
+.sectors-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sector-item{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:18px 20px;
+  display:flex;align-items:center;gap:14px;
+  transition:all .2s;
+}
+.sector-item:hover{border-color:var(--teal);box-shadow:var(--shadow)}
+.sector-item .check-icon{flex-shrink:0;margin-top:0}
+.sector-item h4{font-size:15px;font-weight:700;color:var(--navy)}
+
+/* Stage cards */
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+/* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+.contact-layout{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:24px;
+}
+.contact-info{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:36px 32px;
+}
+.contact-info h3{font-size:20px;font-weight:800;margin-bottom:24px;color:var(--navy)}
+.contact-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px 18px;margin-bottom:10px;
+  font-size:14px;font-weight:600;color:var(--navy);
+  direction:ltr;
+}
+.contact-row-icon{
+  width:32px;height:32px;background:var(--teal);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);font-size:14px;flex-shrink:0;
+}
+.contact-row .check-icon{margin-top:0}
+.wa-btn-full{
+  width:100%;background:var(--teal);color:var(--white);
+  border:none;border-radius:var(--radius-sm);
+  padding:14px;font-size:15px;font-weight:700;
+  margin-top:16px;transition:background .2s;
+}
+.wa-btn-full:hover{background:#009999}
+
+.contact-form{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:36px 32px;
+}
+.contact-form h3{font-size:20px;font-weight:800;margin-bottom:24px;color:var(--navy)}
+.form-row{margin-bottom:16px}
+.form-row label{
+  display:block;font-size:13px;font-weight:600;
+  color:var(--navy);margin-bottom:6px;
+}
+.form-row input,.form-row select,.form-row textarea{
+  width:100%;border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;font-family:'Cairo',sans-serif;
+  font-size:14px;color:var(--navy);
+  background:var(--white);direction:rtl;
+  text-align:right;outline:none;
+  transition:border-color .2s;
+}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{
+  border-color:var(--teal);
+}
+.form-row input::placeholder,.form-row textarea::placeholder{color:#b0bec5}
+.form-row textarea{resize:vertical;min-height:90px}
+.form-submit{
+  width:100%;background:var(--teal);color:var(--white);
+  border:none;border-radius:var(--radius-sm);
+  padding:14px;font-family:'Cairo',sans-serif;
+  font-size:15px;font-weight:700;transition:background .2s;
+}
+.form-submit:hover{background:#009999}
+
+/* ============================================================
+   WHY PAGE - SPECIAL ELEMENTS
+   ============================================================ */
+.why-hero{
+  background:var(--navy);
+  color:var(--white);
+  padding:0;
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:0;
+  min-height:480px;
+  align-items:stretch;
+  overflow:hidden;
+  position:relative;
+}
+.why-hero::before{
+  content:'';position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,175,175,.12) 0%,transparent 70%);
+  top:-150px;right:100px;pointer-events:none;
+}
+
+.why-features{
+  display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;
+}
+.why-feat{
+  display:flex;align-items:center;gap:6px;
+  color:rgba(255,255,255,.7);font-size:13px;
+}
+.why-feat::before{content:'•';color:var(--teal);font-size:16px}
+
+.why-reasons-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.why-reason{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius);
+  padding:24px 20px;text-align:center;
+}
+.why-reason .card-icon{margin:0 auto 14px}
+.why-reason h4{font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px}
+.why-reason p{font-size:12px;color:rgba(255,255,255,.55);line-height:1.55}
+
+/* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.about-mvv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.mvv-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px 24px;
+  text-align:center;
+}
+.mvv-icon{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--teal-light);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;color:var(--teal);font-size:22px;
+}
+.mvv-card h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.mvv-card p{font-size:13px;color:var(--gray-text);line-height:1.6}
+
+.philosophy-box{
+  background:var(--navy);border-radius:var(--radius);
+  padding:40px;color:var(--white);
+}
+.phil-tag{
+  display:inline-block;background:var(--teal);
+  color:var(--white);font-size:12px;font-weight:700;
+  padding:4px 14px;border-radius:6px;margin-bottom:16px;
+}
+.philosophy-box h3{font-size:22px;font-weight:800;margin-bottom:12px}
+.philosophy-box p{font-size:14px;color:rgba(255,255,255,.7);line-height:1.75}
+
+.work-model-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.wm-item{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:10px;padding:20px 16px;text-align:center;
+}
+.wm-item .card-icon{margin:0 auto 12px}
+.wm-item h4{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.wm-item p{font-size:12px;color:var(--gray-text);line-height:1.5}
+
+/* ============================================================
+   PACKAGES
+   ============================================================ */
+.packages-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pkg-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px 24px;
+  transition:all .2s;
+}
+.pkg-card:hover{border-color:var(--teal);box-shadow:var(--shadow)}
+.pkg-card .card-icon{margin-bottom:16px}
+.pkg-card h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.pkg-card p{font-size:13px;color:var(--gray-text);line-height:1.65;margin-bottom:14px}
+.pkg-card .card-link{font-size:13px;font-weight:700;color:var(--teal)}
+
+/* ============================================================
+   CHALLENGES (HOME)
+   ============================================================ */
+.challenges-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:16px;
+}
+.chal-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px 20px;text-align:center;
+}
+.chal-icon{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--teal-light);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;color:var(--teal);
+}
+.chal-card h4{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.chal-card p{font-size:12px;color:var(--gray-text);line-height:1.5}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .nav-links,.btn-nav.desktop{display:none}
+  .hamburger{display:flex}
+
+  .hero,.why-hero{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+  .hero-visual{display:none}
+  .hero-content{padding:40px 24px 36px}
+  .hero-content h1{font-size:clamp(26px,7vw,36px)}
+
+  .section,.section-sm{padding:48px 24px}
+
+  .cards-3,.cards-4,.cards-5{grid-template-columns:1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr}
+  .deliverables-grid{grid-template-columns:1fr}
+  .sectors-grid{grid-template-columns:1fr}
+  .about-grid,.about-mvv-grid{grid-template-columns:1fr}
+  .work-model-grid{grid-template-columns:1fr}
+  .challenges-row{grid-template-columns:1fr}
+  .why-reasons-grid{grid-template-columns:1fr}
+  .stage-grid{grid-template-columns:1fr}
+  .packages-grid{grid-template-columns:1fr}
+  .contact-layout{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .cta-banner{grid-template-columns:1fr}
+  .cta-banner-btns{flex-direction:column;align-items:flex-start}
+  .footer-bottom{flex-direction:column;text-align:center}
+}
+
+@media(min-width:961px) and (max-width:1200px){
+  .cards-3{grid-template-columns:repeat(3,1fr)}
+  .cards-4{grid-template-columns:repeat(2,1fr)}
+  .cards-5{grid-template-columns:repeat(3,1fr)}
+  .steps-row{grid-template-columns:repeat(3,1fr)}
+  .deliverables-grid{grid-template-columns:repeat(3,1fr)}
+  .challenges-row{grid-template-columns:repeat(3,1fr)}
+  .why-reasons-grid{grid-template-columns:repeat(3,1fr)}
+  .work-model-grid{grid-template-columns:repeat(3,1fr)}
+  .sectors-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ============================================================
+   ANIMATIONS & TRANSITIONS
+   ============================================================ */
+
+/* Page transition */
+.page { display: none; }
+.page.active { display: block; }
+.page.fade-in { animation: fadeInPage 0.3s ease both; }
+@keyframes fadeInPage {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Nav scroll effect */
+nav {
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+nav.scrolled {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  background: rgba(2,26,49,0.98);
+  backdrop-filter: blur(10px);
+}
+
+/* Nav link hover */
+.nav-links a {
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+}
+
+/* Logo hover */
+.logo {
+  transition: opacity 0.2s ease;
+}
+.logo:hover { opacity: 0.85; }
+
+/* Buttons */
+.btn-primary, .btn-outline, .btn-nav, .form-submit, .wa-btn-full {
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover  { background: #009999; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,175,175,0.35); }
+.btn-outline:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); transform: translateY(-1px); }
+.btn-nav:hover      { background: #009999; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,175,175,0.3); }
+
+/* Cards */
+.card, .mvv-card, .step-card, .pkg-card, .sector-item, .wm-item, .chal-card, .del-item, .why-reason {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card:hover, .mvv-card:hover, .step-card:hover, .pkg-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(6,43,73,0.14);
+  border-color: rgba(0,175,175,0.3);
+}
+.sector-item:hover { transform: translateY(-2px); }
+.wm-item:hover, .chal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(6,43,73,0.1); }
+.why-reason:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); border-color: rgba(0,175,175,0.3); }
+
+/* Compare boxes hover */
+.compare-box.heu { transition: box-shadow 0.25s ease; }
+.compare-box.heu:hover { box-shadow: 0 8px 32px rgba(0,175,175,0.15); }
+
+/* Card link hover */
+.card-link { transition: color 0.2s, letter-spacing 0.2s; }
+.card-link:hover { letter-spacing: 0.3px; }
+
+/* Hero card subtle float */
+.hero-card {
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Scroll-reveal: elements fade up on enter */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Staggered children */
+/* stagger removed */
+
+/* Section header underline animation */
+.underline-teal {
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Step number pulse on hover */
+.step-num { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.step-card:hover .step-num { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(0,175,175,0.15); }
+
+/* Check icon scale on hover */
+.check-icon { transition: transform 0.2s ease; }
+.sector-item:hover .check-icon { transform: scale(1.1); }
+
+/* CTA banner subtle glow */
+.cta-banner {
+  transition: box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(0,175,175,0.08) 0%, transparent 70%);
+  top: -80px; left: -80px;
+  pointer-events: none;
+}
+
+/* Mobile menu items */
+.mobile-menu a {
+  transition: color 0.18s, background 0.18s, padding-right 0.18s;
+}
+.mobile-menu a:hover { padding-right: 32px; }
+
+/* Form inputs */
+.form-row input, .form-row select, .form-row textarea {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-row input:focus, .form-row textarea:focus {
+  box-shadow: 0 0 0 3px rgba(0,175,175,0.12);
+}
+
+/* Footer links */
+.footer-col a { transition: color 0.18s, padding-right 0.18s; }
+.footer-col a:hover { color: var(--teal) !important; padding-right: 4px; }
+
+/* Hero content stagger */
+.hero-content > * {
+  animation: heroItemIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+.hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.3s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.4s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.5s; }
+@keyframes heroItemIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Hamburger animation */
+.hamburger span { transition: all 0.3s ease; }
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* Teal accent line animation on section load */
+@keyframes lineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.underline-teal {
+  transform-origin: right;
+  animation: lineGrow 0.6s cubic-bezier(0.22,1,0.36,1) 0.3s both;
+}
+
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+#toast-container {
+  position: fixed;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  min-width: 280px;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  pointer-events: all;
+  animation: toastIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+.toast.toast-out {
+  animation: toastOut 0.3s ease forwards;
+}
+.toast-success {
+  background: #ffffff;
+  border: 1.5px solid #00AFAF;
+  color: #062B49;
+}
+.toast-error {
+  background: #ffffff;
+  border: 1.5px solid #EF4444;
+  color: #062B49;
+}
+.toast-warn {
+  background: #ffffff;
+  border: 1.5px solid #F59E0B;
+  color: #062B49;
+}
+.toast-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+.toast-success .toast-icon { background: #E8FAFA; color: #00AFAF; }
+.toast-error   .toast-icon { background: #FEE2E2; color: #EF4444; }
+.toast-warn    .toast-icon { background: #FEF3C7; color: #F59E0B; }
+.toast-msg { flex: 1; line-height: 1.4; }
+.toast-close {
+  background: none; border: none; cursor: pointer;
+  color: #aaa; font-size: 16px; padding: 0 2px;
+  line-height: 1; transition: color 0.2s;
+  font-family: 'Cairo', sans-serif;
+}
+.toast-close:hover { color: #062B49; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-10px) scale(0.95); }
+}
+
+/* Input error state */
+.form-row input.input-error {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important;
+  animation: shake 0.4s ease;
+}
+.form-row input.input-ok {
+  border-color: #00AFAF !important;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+/* Submit button loading state */
+.form-submit.loading {
+  opacity: 0.75;
+  pointer-events: none;
+  position: relative;
+}
+.form-submit.loading::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
 </style>
 </head>
 <body>
 
-<!-- Cursor -->
-<div id="cur"></div>
-<div id="cur-ring"></div>
-
-<!-- NAV -->
+<!-- ==================== NAV ==================== -->
 <nav>
-  <div class="logo">Pixel<em>Craft</em></div>
+  <div id="toast-container"></div>
+
+<button class="btn-nav desktop" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+
   <ul class="nav-links">
-    <li><a href="#services">خدماتنا</a></li>
-    <li><a href="#process">كيف نعمل</a></li>
-    <li><a href="#order" class="nav-cta">اطلب الآن</a></li>
+    <li><a class="nav-link" onclick="goTo('contact')">تواصل معنا</a></li>
+    <li><a class="nav-link" onclick="goTo('sectors')">القطاعات</a></li>
+    <li><a class="nav-link" onclick="goTo('why')">لماذا هيومد؟</a></li>
+    <li><a class="nav-link" onclick="goTo('method')">منهجيتنا</a></li>
+    <li><a class="nav-link" onclick="goTo('services')">خدماتنا</a></li>
+    <li><a class="nav-link" onclick="goTo('about')">من نحن</a></li>
+    <li><a class="nav-link" onclick="goTo('home')">الرئيسية</a></li>
   </ul>
+
+  <a class="logo" onclick="goTo('home')" style="display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 180 180">
+      <polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/>
+      <polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/>
+      <polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/>
+      <polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/>
+      <polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/>
+      <polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/>
+    </svg>
+    <div style="line-height:1.15">
+      <div style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:0.2px">HeuMed</div>
+      <div style="font-size:10px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div>
+    </div>
+  </a>
+
+  <button class="hamburger" onclick="toggleMobile()" aria-label="القائمة">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
-
-  <div class="hero-content">
-    <div class="hero-tag">
-      <span class="tag-dot"></span>
-      نقبل مشاريع جديدة الآن
-    </div>
-    <h1>
-      <span class="line1">نصنع مواقع</span>
-      <span class="line2">لا تُنسى</span>
-      <span class="line3">أبداً</span>
-    </h1>
-    <p class="hero-desc">من الفكرة إلى الموقع الحي — نبني تجارب رقمية تُبهر زوارك وتحوّلهم إلى عملاء.</p>
-    <div class="hero-btns">
-      <a href="#order" class="btn-glow">ابدأ مشروعك الآن</a>
-      <a href="#services" class="btn-outline">استكشف خدماتنا ←</a>
-    </div>
-  </div>
-
-  <div class="scroll-hint">
-    <span>scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
-
-<!-- COUNTERS -->
-<div class="counters">
-  <div class="counter-item fade-up">
-    <div class="counter-num"><b id="c1">0</b>+</div>
-    <div class="counter-label">مشروع منجز</div>
-  </div>
-  <div class="counter-item fade-up" style="transition-delay:0.1s">
-    <div class="counter-num"><b id="c2">0</b>%</div>
-    <div class="counter-label">رضا العملاء</div>
-  </div>
-  <div class="counter-item fade-up" style="transition-delay:0.2s">
-    <div class="counter-num"><b id="c3">0</b> أيام</div>
-    <div class="counter-label">متوسط التسليم</div>
-  </div>
-  <div class="counter-item fade-up" style="transition-delay:0.3s">
-    <div class="counter-num"><b id="c4">0</b>+</div>
-    <div class="counter-label">سنوات خبرة</div>
-  </div>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="goTo('home');closeMobile()">الرئيسية</a>
+  <a onclick="goTo('about');closeMobile()">من نحن</a>
+  <a onclick="goTo('services');closeMobile()">خدماتنا</a>
+  <a onclick="goTo('method');closeMobile()">منهجيتنا</a>
+  <a onclick="goTo('why');closeMobile()">لماذا هيومد؟</a>
+  <a onclick="goTo('sectors');closeMobile()">القطاعات</a>
+  <a onclick="goTo('contact');closeMobile()">تواصل معنا</a>
+  <a class="m-cta" onclick="goTo('contact');closeMobile()">ابدأ بتقييم تشخيصي</a>
 </div>
 
-<!-- SERVICES -->
-<section class="section" id="services">
-  <div class="section-tag">خدماتنا</div>
-  <h2 class="section-title fade-up">كل ما تحتاجه<br><span>تحت سقف واحد</span></h2>
-  <div class="services-grid">
-    <div class="svc-card fade-up">
-      <div class="svc-num">01</div>
-      <span class="svc-icon">🎨</span>
-      <div class="svc-name">موقع شركة / شخصي</div>
-      <div class="svc-desc">تصميم احترافي يعكس هويتك ويترك انطباعاً أول لا يُنسى.</div>
-      <div class="svc-price">1,500 ريال <small>/ يبدأ من</small></div>
+
+<!-- ==========================================
+     HOME PAGE
+     ========================================== -->
+<div id="page-home" class="page active">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">لا تبدأ مشروعك الصحي</span>
+        <span class="teal">قبل أن تختبر جاهزيته للتشغيل</span>
+      </h1>
+      <p>ربط التصميم، التجهيز، الموارد البشرية، الجودة، ودورة الإيرادات ضمن نموذج تشغيلي متكامل يؤسس لنجاح مستدام.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge-item">خبرات متعددة التخصصات</div>
+        <div class="hero-badge-item">منهجية عملية</div>
+        <div class="hero-badge-item">مخرجات قابلة للتنفيذ</div>
+      </div>
     </div>
-    <div class="svc-card fade-up" style="transition-delay:0.1s">
-      <div class="svc-num">02</div>
-      <span class="svc-icon">🛒</span>
-      <div class="svc-name">متجر إلكتروني</div>
-      <div class="svc-desc">متجر متكامل مع دفع إلكتروني، إدارة منتجات وتجربة تسوق سلسة.</div>
-      <div class="svc-price">3,500 ريال <small>/ يبدأ من</small></div>
-    </div>
-    <div class="svc-card fade-up" style="transition-delay:0.2s">
-      <div class="svc-num">03</div>
-      <span class="svc-icon">📊</span>
-      <div class="svc-name">لوحة تحكم</div>
-      <div class="svc-desc">واجهة إدارية متكاملة لإدارة بياناتك وأعمالك بكفاءة عالية.</div>
-      <div class="svc-price">4,000 ريال <small>/ يبدأ من</small></div>
-    </div>
-    <div class="svc-card fade-up" style="transition-delay:0.3s">
-      <div class="svc-num">04</div>
-      <span class="svc-icon">📱</span>
-      <div class="svc-name">صفحة هبوط</div>
-      <div class="svc-desc">صفحة مصممة للتحويل — تحول الزوار إلى عملاء حقيقيين.</div>
-      <div class="svc-price">800 ريال <small>/ يبدأ من</small></div>
-    </div>
-    <div class="svc-card fade-up" style="transition-delay:0.4s">
-      <div class="svc-num">05</div>
-      <span class="svc-icon">⚡</span>
-      <div class="svc-name">تطبيق ويب</div>
-      <div class="svc-desc">تطبيق تفاعلي متكامل بوظائف متقدمة وأداء عالٍ لا يُنافَس.</div>
-      <div class="svc-price">6,000 ريال <small>/ يبدأ من</small></div>
-    </div>
-    <div class="svc-card fade-up" style="transition-delay:0.5s">
-      <div class="svc-num">06</div>
-      <span class="svc-icon">🔄</span>
-      <div class="svc-name">تحديث موقع قائم</div>
-      <div class="svc-desc">نرفع موقعك القديم لمستوى جديد بدون الحاجة للبناء من صفر.</div>
-      <div class="svc-price">700 ريال <small>/ يبدأ من</small></div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- PROCESS -->
-<section class="process-section" id="process">
-  <div class="section-tag">كيف نعمل</div>
-  <h2 class="section-title fade-up">من الفكرة<br><span>للإطلاق</span></h2>
-  <div class="process-steps">
-    <div class="step fade-up">
-      <div class="step-circle">1</div>
-      <div class="step-title">أرسل طلبك</div>
-      <div class="step-desc">املأ النموذج بتفاصيل مشروعك</div>
-    </div>
-    <div class="step fade-up" style="transition-delay:0.1s">
-      <div class="step-circle">2</div>
-      <div class="step-title">نراجع ونعرض</div>
-      <div class="step-desc">نرسل لك عرض سعر خلال 24 ساعة</div>
-    </div>
-    <div class="step fade-up" style="transition-delay:0.2s">
-      <div class="step-circle">3</div>
-      <div class="step-title">نبدأ التصميم</div>
-      <div class="step-desc">تتابع معنا كل خطوة في التنفيذ</div>
-    </div>
-    <div class="step fade-up" style="transition-delay:0.3s">
-      <div class="step-circle">4</div>
-      <div class="step-title">التسليم والإطلاق</div>
-      <div class="step-desc">موقعك يصبح حياً وجاهزاً للعالم</div>
+  <!-- التحديات -->
+  <div class="section section-bg" style="padding-top:56px;padding-bottom:56px">
+    <div class="challenges-row">
+      <div class="chal-card">
+        <div class="chal-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-3-3v6M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z"/></svg>
+        </div>
+        <h4>تصميم لا يخدم التشغيل</h4>
+        <p>مساحات ومسارات لا تعكس واقع العمل اليومي.</p>
+      </div>
+      <div class="chal-card">
+        <div class="chal-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <h4>تجهيز غير مرتبط بالخدمة</h4>
+        <p>معدات وتكاليف لا تخدم النموذج التشغيلي.</p>
+      </div>
+      <div class="chal-card">
+        <div class="chal-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        </div>
+        <h4>توظيف زائد أو ناقص</h4>
+        <p>هدر في التكلفة أو ضعف في الإنتاجية.</p>
+      </div>
+      <div class="chal-card">
+        <div class="chal-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h4>دورة إيرادات غير ناضجة</h4>
+        <p>مطالبات مرفوضة وتدفق نقدي ضعيف.</p>
+      </div>
+      <div class="chal-card">
+        <div class="chal-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+        </div>
+        <h4>جودة شكلية</h4>
+        <p>استكمال الفراغ دون تحسين تجربة المريض.</p>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- ORDER FORM -->
-<section class="order-section" id="order">
-  <div class="order-grid">
-    <div class="order-info fade-up">
-      <div class="section-tag">اطلب الآن</div>
-      <h2 class="section-title">أخبرنا<br>عن <span>مشروعك</span></h2>
-      <p>نرد عليك خلال 24 ساعة بعرض مخصص لاحتياجاتك ومتطلباتك.</p>
-      <div class="trust-items">
-        <div class="trust-item">
-          <div class="ti-icon">⚡</div>
-          <div class="ti-text">
-            <strong>رد سريع</strong>
-            نتواصل معك خلال 24 ساعة
+  <!-- خدمات تغطي دورة حياة المشروع الصحي -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>خدمات تغطي دورة حياة المشروع الصحي</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="cards-3">
+      <div class="card">
+        <div class="card-icon">✓</div>
+        <h3>تطوير المشاريع والحلول الهندسية</h3>
+        <p>ربط التصميم الهندسي بالمسارات التشغيلية والتراخيص.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">📦</div>
+        <h3>التجهيز والإمداد الاستراتيجي</h3>
+        <p>المعدات، الموردين، المشتريات، العقود والخدمات المساندة.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">👥</div>
+        <h3>الموارد البشرية والنمو المؤسسي</h3>
+        <p>الهيكل، القوى العاملة، السياسات، الأوصاف وحوكمة العقود.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">⊗</div>
+        <h3>الجودة وتجربة المريض</h3>
+        <p>الاعتماد، سلامة المرضى، إدارة المخاطر وتحسين التجربة.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">💲</div>
+        <h3>هندسة الإيرادات والحلول المالية</h3>
+        <p>المطالبات، التحصيل، التسعير وتقليل المرفوضات.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">⚙️</div>
+        <h3>التشغيل والتحسين المستمر</h3>
+        <p>مؤشرات، فجوات، خطط تحسين ومتابعة أداء مستمرة.</p>
+        <a class="card-link" onclick="goTo('services')">اعرف أكثر</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- لماذا HeuMed Partners؟ -->
+  <div class="section section-navy">
+    <div class="section-header">
+      <h2>لماذا HeuMed Partners؟</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="why-reasons-grid">
+      <div class="why-reason">
+        <div class="card-icon">✓</div>
+        <h4>نموذج متكامل</h4>
+        <p>ربط عناصر المشروع في منظومة واحدة لا خدمات منفردة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">📊</div>
+        <h4>مخرجات قابلة للتنفيذ</h4>
+        <p>خطط، سياسات، مؤشرات، مصفوفات ونماذج متابعة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">👥</div>
+        <h4>خبرات متعددة التخصصات</h4>
+        <p>تشغيل، جودة، موارد بشرية، إيرادات، تجهيز وهندسة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">⚠️</div>
+        <h4>تقليل المخاطر والهدر</h4>
+        <p>كشف الفجوات مبكرًا قبل أن تتحول إلى تكلفة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">🎯</div>
+        <h4>تركيز على الأثر</h4>
+        <p>نقيس ما يهم: الجاهزية، الامتثال، الكفاءة والإيرادات.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- منهجيتنا -->
+  <div class="section section-bg">
+    <div class="section-header">
+      <h2>منهجيتنا</h2>
+      <div class="underline-teal"></div>
+      <p>من التشخيص إلى الاستدامة</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h4>التشخيص والتقييم</h4>
+        <p>تحليل الوضع الحالي وتحديد الفجوات والمخاطر والأولويات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h4>التصميم والتخطيط</h4>
+        <p>بناء النموذج التشغيلي والخطط والمؤشرات والمخرجات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h4>التأسيس والتهيئة</h4>
+        <p>تحويل الحل إلى سياسات، نماذج، جداول وخطط جاهزة.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <h4>التشغيل التجريبي</h4>
+        <p>اختبار رحلة المريض، الكادر، دورة الإيرادات والخدمات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">05</div>
+        <h4>التحسين والاستدامة</h4>
+        <p>متابعة الأداء وإغلاق الفجوات وتحسين النتائج.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     SERVICES PAGE
+     ========================================== -->
+<div id="page-services" class="page">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">خدمات استشارية تغطي</span>
+        <span class="teal">دورة حياة المشروع الصحي</span>
+      </h1>
+      <p>من الفكرة والتصميم إلى التشغيل والتحسين، نقدم حلولًا مترابطة تساعد على رفع الجاهزية وتقليل المخاطر.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">استعرض خدماتنا</button>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge-item">خبرات متعددة التخصصات</div>
+        <div class="hero-badge-item">منهجية عملية</div>
+        <div class="hero-badge-item">مخرجات قابلة للتنفيذ</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top">
+          <div class="hero-card-box"></div>
+          <div class="hero-card-box"></div>
+          <div class="hero-card-box"></div>
+        </div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- مجالات الخدمة -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>مجالات خدماتنا</h2>
+      <div class="underline-teal"></div>
+      <p>خدمات استشارية مترابطة تغطي التأسيس والتطوير والتشغيل والتحسين.</p>
+    </div>
+    <div class="cards-3">
+      <div class="card">
+        <div class="card-icon">✓</div>
+        <h3>تطوير المشاريع والحلول الهندسية</h3>
+        <p>ربط التصميم الهندسي بالمسارات التشغيلية والتراخيص.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">📦</div>
+        <h3>التجهيز والإمداد الاستراتيجي</h3>
+        <p>المعدات، الموردين، المشتريات، العقود والخدمات المساندة.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">👥</div>
+        <h3>الموارد البشرية والنمو المؤسسي</h3>
+        <p>الهيكل، القوى العاملة، السياسات، الأوصاف وحوكمة العقود.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">⊗</div>
+        <h3>الجودة وتجربة المريض</h3>
+        <p>الاعتماد، سلامة المرضى، إدارة المخاطر وتحسين التجربة.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">💲</div>
+        <h3>هندسة الإيرادات والحلول المالية</h3>
+        <p>المطالبات، التحصيل، التسعير وتقليل المرفوضات.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">⚙️</div>
+        <h3>التشغيل والتحسين المستمر</h3>
+        <p>مؤشرات، فجوات، خطط تحسين ومتابعة أداء مستمرة.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- الباقات الرئيسية -->
+  <div class="section section-bg">
+    <div class="section-header">
+      <h2>الباقات الرئيسية</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="packages-grid">
+      <div class="pkg-card">
+        <div class="card-icon">✓</div>
+        <h3>باقة التشخيص</h3>
+        <p>تحديد الفجوات والمخاطر والأولويات قبل القرار. تقرير تشخيصي، مصفوفة مخاطر، خارطة طريق تدخل.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="pkg-card">
+        <div class="card-icon" style="font-size:18px">📊</div>
+        <h3>باقة التأسيس</h3>
+        <p>تحويل الفكرة إلى نموذج جاهز للتشغيل. هيكل وقوى عاملة كاملة، سياسات وتشغيل خطة جاهزية.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+      <div class="pkg-card">
+        <div class="card-icon" style="font-size:18px">💡</div>
+        <h3>باقة التطوير</h3>
+        <p>تحسين أداء منشأة قائمة أو متعددة. تحليل أداء أو متعددة، خطة تحسين.</p>
+        <a class="card-link">اعرف أكثر</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180">
+            <polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/>
+            <polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/>
+            <polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/>
+            <polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/>
+            <polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/>
+            <polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/>
+          </svg>
+          <div style="line-height:1.15">
+            <div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div>
+            <div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div>
           </div>
         </div>
-        <div class="trust-item">
-          <div class="ti-icon">🔒</div>
-          <div class="ti-text">
-            <strong>بياناتك آمنة</strong>
-            لا نشارك معلوماتك مع أي طرف
+        <p>شريك تطوير وتشغيل المنظومات الصحية</p>
+      </div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     ABOUT PAGE (من نحن)
+     ========================================== -->
+<div id="page-about" class="page">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">HeuMed Partners</span>
+        <span class="teal">شريك تطوير وتشغيل المنظومات الصحية</span>
+      </h1>
+      <p>نموذج استشاري يربط الاستثمار الصحي بالتشغيل الفعلي من خلال حلول متكاملة ومخرجات قابلة للتطبيق.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge-item">خبرات متعددة التخصصات</div>
+        <div class="hero-badge-item">منهجية عملية</div>
+        <div class="hero-badge-item">مخرجات قابلة للتنفيذ</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- من نحن -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>من نحن</h2>
+      <div class="underline-teal"></div>
+      <p>هوية HeuMed ودورها في تطوير وتشغيل المنشآت الصحية.</p>
+    </div>
+    <div class="about-mvv-grid">
+      <div class="mvv-card">
+        <div class="mvv-icon">✓</div>
+        <h3>رؤيتنا</h3>
+        <p>أن نكون شريكًا موثوقًا في تطوير وتشغيل المنشآت الصحية الخاصة.</p>
+      </div>
+      <div class="mvv-card">
+        <div class="mvv-icon" style="font-size:18px">📊</div>
+        <h3>رسالتنا</h3>
+        <p>تمكين المستثمرين من بناء وتشغيل مشاريع صحية مستدامة بحلول مترابطة.</p>
+      </div>
+      <div class="mvv-card">
+        <div class="mvv-icon" style="font-size:18px">💡</div>
+        <h3>فلسفتنا</h3>
+        <p>تشغيل منضبط قبل الوقود العامة. مخرجات عملية لا تقارير نظرية.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- نموذج العمل -->
+  <div class="section section-bg">
+    <div class="section-header">
+      <h2>نموذج العمل</h2>
+      <div class="underline-teal"></div>
+      <p>نربط التصميم والتجهيز والموارد البشرية والجودة ودورة الإيرادات ضمن منظومة واحدة.</p>
+    </div>
+    <div class="work-model-grid">
+      <div class="wm-item">
+        <div class="card-icon">✓</div>
+        <h4>نموذج متكامل</h4>
+        <p>ربط عناصر المشروع في منظومة واحدة لا خدمات منفردة.</p>
+      </div>
+      <div class="wm-item">
+        <div class="card-icon" style="font-size:18px">📊</div>
+        <h4>مخرجات قابلة للتنفيذ</h4>
+        <p>خطط، سياسات، مؤشرات، مصفوفات ونماذج متابعة.</p>
+      </div>
+      <div class="wm-item">
+        <div class="card-icon" style="font-size:18px">👥</div>
+        <h4>خبرات متعددة التخصصات</h4>
+        <p>تشغيل، جودة، موارد بشرية، إيرادات، تجهيز وهندسة.</p>
+      </div>
+      <div class="wm-item">
+        <div class="card-icon" style="font-size:18px">⚠️</div>
+        <h4>تقليل المخاطر والهدر</h4>
+        <p>كشف الفجوات مبكرًا قبل أن تتحول إلى تكلفة.</p>
+      </div>
+      <div class="wm-item">
+        <div class="card-icon" style="font-size:18px">🎯</div>
+        <h4>تركيز على الأثر</h4>
+        <p>نقيس ما يهم: الجاهزية، الامتثال، الكفاءة والإيرادات.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     METHOD PAGE (منهجيتنا)
+     ========================================== -->
+<div id="page-method" class="page">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">منهجية عملية تبدأ</span>
+        <span class="teal">بالتشخيص وتنتهي بالاستدامة</span>
+      </h1>
+      <p>تحوّل الاحتياج إلى خطة واضحة، ثم إلى مخرجات قابلة للتنفيذ والقياس والمتابعة.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge-item">خبرات متعددة التخصصات</div>
+        <div class="hero-badge-item">منهجية عملية</div>
+        <div class="hero-badge-item">مخرجات قابلة للتنفيذ</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- المنهجية -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>منهجيتنا</h2>
+      <div class="underline-teal"></div>
+      <p>من التشخيص إلى الاستدامة</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h4>التشخيص والتقييم</h4>
+        <p>تحليل الوضع الحالي وتحديد الفجوات والمخاطر والأولويات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h4>التصميم والتخطيط</h4>
+        <p>بناء النموذج التشغيلي والخطط والمؤشرات والمخرجات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h4>التأسيس والتهيئة</h4>
+        <p>تحويل الحل إلى سياسات، نماذج، جداول وخطط جاهزة.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <h4>التشغيل التجريبي</h4>
+        <p>اختبار رحلة المريض، الكادر، دورة الإيرادات والخدمات.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">05</div>
+        <h4>التحسين والاستدامة</h4>
+        <p>متابعة الأداء وإغلاق الفجوات وتحسين النتائج.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- مخرجات قابلة للتنفيذ -->
+  <div class="section section-bg">
+    <div class="section-header">
+      <h2>مخرجات قابلة للتنفيذ</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="deliverables-grid">
+      <div class="del-item">
+        <div class="check-icon yes">✓</div>
+        <p>تقرير تشخيصي</p>
+        <span style="font-size:12px;color:var(--gray-text)">يوضح الوضع الحالي والفجوات والأولويات.</span>
+      </div>
+      <div class="del-item">
+        <div class="check-icon yes">✓</div>
+        <p>مصفوفة مخاطر</p>
+        <span style="font-size:12px;color:var(--gray-text)">تربط المخاطر بالأثر والمسؤوليات.</span>
+      </div>
+      <div class="del-item">
+        <div class="check-icon yes">✓</div>
+        <p>خطة تدخل</p>
+        <span style="font-size:12px;color:var(--gray-text)">تحدد المراحل والمخرجات وجدول التنفيذ.</span>
+      </div>
+      <div class="del-item">
+        <div class="check-icon yes">✓</div>
+        <p>مؤشرات متابعة</p>
+        <span style="font-size:12px;color:var(--gray-text)">لقياس الجاهزية والإنجاز والأثر.</span>
+      </div>
+      <div class="del-item">
+        <div class="check-icon yes">✓</div>
+        <p>تقرير إفعال</p>
+        <span style="font-size:12px;color:var(--gray-text)">يوثق ما تم وفرص التطوير.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     WHY PAGE (لماذا هيومد؟)
+     ========================================== -->
+<div id="page-why" class="page">
+
+  <div class="why-hero hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">لماذا تختار</span>
+        <span class="teal">HeuMed Partners؟</span>
+      </h1>
+      <p>لأننا لا نتعامل مع المشروع الصحي كخدمات منفصلة، بل كمنظومة مترابطة يجب اختبار جاهزيتها قبل التشغيل.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+      <div class="why-features">
+        <div class="why-feat">خبرات متعددة التخصصات</div>
+        <div class="why-feat">منهجية عملية</div>
+        <div class="why-feat">مخرجات قابلة للتنفيذ</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- المقارنة -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>النموذج التقليدي مقابل نموذج HeuMed</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-box trad">
+        <h3>النموذج التقليدي</h3>
+        <div class="check-item">
+          <div class="check-icon no">✕</div>
+          <div>
+            <h4>خدمات منفصلة</h4>
+            <p>تداخل بين التصميم والتشغيل والجودة والإيرادات.</p>
           </div>
         </div>
-        <div class="trust-item">
-          <div class="ti-icon">💯</div>
-          <div class="ti-text">
-            <strong>ضمان الرضا</strong>
-            تعديلات مجانية حتى ترضى تماماً
+        <div class="check-item">
+          <div class="check-icon no">✕</div>
+          <div>
+            <h4>تقارير نظرية</h4>
+            <p>توصيات لا تتحول دائمًا إلى أدوات تنفيذ.</p>
           </div>
         </div>
-        <div class="trust-item">
-          <div class="ti-icon">📋</div>
-          <div class="ti-text">
-            <strong>عقد رسمي</strong>
-            نوقع عقد واضح قبل بدء العمل
+        <div class="check-item">
+          <div class="check-icon no">✕</div>
+          <div>
+            <h4>اكتشاف متأخر</h4>
+            <p>الفجوات تظهر بعد الافتتاح أو أثناء التقييم.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon no">✕</div>
+          <div>
+            <h4>تكاليف غير متوقعة</h4>
+            <p>قرارات تأسيسية دون اختبار تشغيلي كافٍ.</p>
+          </div>
+        </div>
+      </div>
+      <div class="compare-box heu">
+        <h3>نموذج HeuMed</h3>
+        <div class="check-item" style="background:rgba(255,255,255,.7)">
+          <div class="check-icon yes">✓</div>
+          <div>
+            <h4>نموذج مترابط</h4>
+            <p>ربط التصميم بالتشغيل والامتثال والإيرادات.</p>
+          </div>
+        </div>
+        <div class="check-item" style="background:rgba(255,255,255,.7)">
+          <div class="check-icon yes">✓</div>
+          <div>
+            <h4>مخرجات عملية</h4>
+            <p>خطط، مؤشرات، سياسات، مصفوفات ونماذج.</p>
+          </div>
+        </div>
+        <div class="check-item" style="background:rgba(255,255,255,.7)">
+          <div class="check-icon yes">✓</div>
+          <div>
+            <h4>تشخيص مبكر</h4>
+            <p>تحديد المخاطر قبل تحولها إلى تكلفة.</p>
+          </div>
+        </div>
+        <div class="check-item" style="background:rgba(255,255,255,.7)">
+          <div class="check-icon yes">✓</div>
+          <div>
+            <h4>اختبار تشغيل</h4>
+            <p>تجربة المسارات قبل التشغيل التجاري الكامل.</p>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="order-form fade-up" style="transition-delay:0.2s">
-      <!-- Form content -->
-      <div id="formContent">
-        <div class="form-title">نموذج الطلب</div>
-        <div class="form-subtitle">أكمل البيانات وسنتواصل معك فوراً 🚀</div>
-
-        <!-- Progress -->
-        <div class="order-progress">
-          <div class="progress-steps">
-            <div class="ps done" id="ps1"></div>
-            <div class="ps" id="ps2"></div>
-            <div class="ps" id="ps3"></div>
-          </div>
-          <div class="progress-label">الخطوة <span id="stepLabel">1</span> من 3</div>
-        </div>
-
-        <form id="orderForm" action="https://formspree.io/f/mbdqepna" method="POST">
-
-          <!-- STEP 1: Personal Info -->
-          <div id="step1">
-            <div class="form-row">
-              <div class="field">
-                <label>الاسم الكامل *</label>
-                <input type="text" name="name" placeholder="محمد العلي" required>
-              </div>
-              <div class="field">
-                <label>رقم الجوال *</label>
-                <input type="tel" name="phone" placeholder="05XXXXXXXX" required>
-              </div>
-            </div>
-            <div class="field">
-              <label>البريد الإلكتروني *</label>
-              <input type="email" name="email" placeholder="email@example.com" required>
-            </div>
-            <div class="field">
-              <label>اسم الشركة / المشروع</label>
-              <input type="text" name="company" placeholder="اختياري">
-            </div>
-            <button type="button" class="submit-btn" onclick="nextStep(2)">التالي ←</button>
-          </div>
-
-          <!-- STEP 2: Project Details -->
-          <div id="step2" style="display:none">
-            <label class="field-label-pkg">اختر نوع الخدمة *</label>
-            <div class="package-select" id="pkgSelect">
-              <div class="pkg" onclick="selectPkg(this,'موقع شركة',1500)">
-                <div class="pkg-name">موقع شركة</div>
-                <div class="pkg-price">من 1,500 ريال</div>
-              </div>
-              <div class="pkg" onclick="selectPkg(this,'متجر إلكتروني',3500)">
-                <div class="pkg-name">متجر إلكتروني</div>
-                <div class="pkg-price">من 3,500 ريال</div>
-              </div>
-              <div class="pkg" onclick="selectPkg(this,'صفحة هبوط',800)">
-                <div class="pkg-name">صفحة هبوط</div>
-                <div class="pkg-price">من 800 ريال</div>
-              </div>
-              <div class="pkg" onclick="selectPkg(this,'لوحة تحكم',4000)">
-                <div class="pkg-name">لوحة تحكم</div>
-                <div class="pkg-price">من 4,000 ريال</div>
-              </div>
-              <div class="pkg" onclick="selectPkg(this,'تطبيق ويب',6000)">
-                <div class="pkg-name">تطبيق ويب</div>
-                <div class="pkg-price">من 6,000 ريال</div>
-              </div>
-              <div class="pkg" onclick="selectPkg(this,'تحديث موقع',700)">
-                <div class="pkg-name">تحديث موقع</div>
-                <div class="pkg-price">من 700 ريال</div>
-              </div>
-            </div>
-            <input type="hidden" name="service_type" id="serviceType">
-
-            <label class="field-label-pkg" style="margin-top:1rem">الميزات المطلوبة</label>
-            <div class="features-grid" id="featGrid">
-              <div class="feat" onclick="toggleFeat(this,'نظام دفع')">
-                <div class="feat-check">✓</div><span class="feat-name">نظام دفع</span>
-              </div>
-              <div class="feat" onclick="toggleFeat(this,'لوحة تحكم')">
-                <div class="feat-check">✓</div><span class="feat-name">لوحة تحكم</span>
-              </div>
-              <div class="feat" onclick="toggleFeat(this,'تعدد اللغات')">
-                <div class="feat-check">✓</div><span class="feat-name">تعدد اللغات</span>
-              </div>
-              <div class="feat" onclick="toggleFeat(this,'SEO متقدم')">
-                <div class="feat-check">✓</div><span class="feat-name">SEO متقدم</span>
-              </div>
-              <div class="feat" onclick="toggleFeat(this,'تتبع الطلبات')">
-                <div class="feat-check">✓</div><span class="feat-name">تتبع الطلبات</span>
-              </div>
-              <div class="feat" onclick="toggleFeat(this,'Apple Pay')">
-                <div class="feat-check">✓</div><span class="feat-name">Apple Pay</span>
-              </div>
-            </div>
-            <input type="hidden" name="features" id="featuresInput">
-
-            <div class="form-row" style="margin-top:0.5rem">
-              <button type="button" class="submit-btn" style="background:rgba(255,255,255,0.06)" onclick="nextStep(1)">← رجوع</button>
-              <button type="button" class="submit-btn" onclick="nextStep(3)">التالي ←</button>
-            </div>
-          </div>
-
-          <!-- STEP 3: Budget & Details -->
-          <div id="step3" style="display:none">
-            <div class="field">
-              <label>الميزانية التقريبية</label>
-              <select name="budget">
-                <option value="" disabled selected>اختر نطاق الميزانية</option>
-                <option>أقل من 1,000 ريال</option>
-                <option>1,000 - 3,000 ريال</option>
-                <option>3,000 - 6,000 ريال</option>
-                <option>6,000 - 10,000 ريال</option>
-                <option>أكثر من 10,000 ريال</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>مدة التسليم المطلوبة</label>
-              <select name="deadline">
-                <option value="" disabled selected>اختر المدة</option>
-                <option>أسبوع واحد (عاجل)</option>
-                <option>أسبوعان</option>
-                <option>شهر</option>
-                <option>مرن / لا يهم</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>تفاصيل المشروع *</label>
-              <textarea name="details" placeholder="أخبرنا عن فكرتك، طبيعة نشاطك، ومتطلباتك..." required></textarea>
-            </div>
-            <div class="field">
-              <label>رابط مرجعي (اختياري)</label>
-              <input type="url" name="reference" placeholder="https://موقع-تعجبك.com">
-            </div>
-
-            <!-- Price estimate -->
-            <div class="price-box">
-              <div class="price-label">التقدير المبدئي</div>
-              <div class="price-val" id="priceDisplay">-- <small>ريال</small></div>
-            </div>
-
-            <div class="form-row">
-              <button type="button" class="submit-btn" style="background:rgba(255,255,255,0.06)" onclick="nextStep(2)">← رجوع</button>
-              <button type="submit" class="submit-btn" id="submitBtn">إرسال الطلب 🚀</button>
-            </div>
-
-            <div class="form-note">🔒 بياناتك محمية وآمنة تماماً</div>
-          </div>
-
-        </form>
+  <!-- لماذا HeuMed؟ -->
+  <div class="section section-navy">
+    <div class="section-header">
+      <h2>لماذا HeuMed Partners؟</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="why-reasons-grid">
+      <div class="why-reason">
+        <div class="card-icon">✓</div>
+        <h4>نموذج متكامل</h4>
+        <p>ربط عناصر المشروع في منظومة واحدة لا خدمات منفردة.</p>
       </div>
-
-      <!-- Success Screen -->
-      <div class="success-screen" id="successScreen">
-        <div class="success-icon">✅</div>
-        <div class="success-title">تم استلام طلبك!</div>
-        <div class="success-ref" id="refNum">PC-0000</div>
-        <div class="success-msg">
-          احتفظ برقم الطلب هذا للمتابعة.<br>
-          سنتواصل معك على إيميلك خلال <strong style="color:#fff">24 ساعة</strong> بعرض مخصص.
-        </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">📊</div>
+        <h4>مخرجات قابلة للتنفيذ</h4>
+        <p>خطط، سياسات، مؤشرات، مصفوفات ونماذج متابعة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">👥</div>
+        <h4>خبرات متعددة التخصصات</h4>
+        <p>تشغيل، جودة، موارد بشرية، إيرادات، تجهيز وهندسة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">⚠️</div>
+        <h4>تقليل المخاطر والهدر</h4>
+        <p>كشف الفجوات مبكرًا قبل أن تتحول إلى تكلفة.</p>
+      </div>
+      <div class="why-reason">
+        <div class="card-icon" style="font-size:18px">🎯</div>
+        <h4>تركيز على الأثر</h4>
+        <p>نقيس ما يهم: الجاهزية، الامتثال، الكفاءة والإيرادات.</p>
       </div>
     </div>
   </div>
-</section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">Pixel<em>Craft</em></div>
-  <p>© 2026 PixelCraft Studio — جميع الحقوق محفوظة</p>
-  <p style="color:rgba(255,255,255,0.15);font-size:0.75rem">صُنع بـ ❤️ في السعودية</p>
-</footer>
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
 
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     SECTORS PAGE (القطاعات)
+     ========================================== -->
+<div id="page-sectors" class="page">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">نخدم قطاعات صحية</span>
+        <span class="teal">باحتياجات تشغيلية مختلفة</span>
+      </h1>
+      <p>نساعد المنشآت الصحية في مراحل التأسيس والتطوير ورفع الجاهزية حسب طبيعة الخدمة وحجم المشروع.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge-item">خبرات متعددة التخصصات</div>
+        <div class="hero-badge-item">منهجية عملية</div>
+        <div class="hero-badge-item">مخرجات قابلة للتنفيذ</div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- القطاعات -->
+  <div class="section section-white">
+    <div class="section-header">
+      <h2>القطاعات التي نخدمها</h2>
+      <div class="underline-teal"></div>
+      <p>نغطي أنماطًا مختلفة من المنشآت الصحية حسب مرحلة المشروع ونوع الخدمة.</p>
+    </div>
+    <div class="sectors-grid">
+      <div class="sector-item">
+        <div class="check-icon yes">✓</div>
+        <h4>المجمعات الطبية</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">📊</div>
+        <h4>العيادات المتخصصة</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">💡</div>
+        <h4>مراكز الأسنان</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">⊗</div>
+        <h4>مراكز التأهيل</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon no" style="background:var(--teal-light);color:var(--teal)">⊗</div>
+        <h4>الصحة النفسية</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes">✓</div>
+        <h4>مراكز اليوم الواحد</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">📊</div>
+        <h4>المختبرات</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">💡</div>
+        <h4>مراكز الأشعة</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">⊗</div>
+        <h4>الرعاية المنزلية</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon no" style="background:var(--teal-light);color:var(--teal)">⊗</div>
+        <h4>العلاج الطبيعي</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes">✓</div>
+        <h4>المنشآت الناشئة</h4>
+      </div>
+      <div class="sector-item">
+        <div class="check-icon yes" style="font-size:14px">📊</div>
+        <h4>المشاريع متعددة الفروع</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- حسب مرحلة المشروع -->
+  <div class="section section-bg">
+    <div class="section-header">
+      <h2>حسب مرحلة المشروع</h2>
+      <div class="underline-teal"></div>
+    </div>
+    <div class="stage-grid">
+      <div class="card">
+        <div class="card-icon">✓</div>
+        <h3>مشاريع جديدة</h3>
+        <p>نموذج تشغيل: هيكل، تجهيز، جودة وإيرادات قبل الافتتاح.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">📊</div>
+        <h3>منشآت قائمة</h3>
+        <p>تحليل فجوات وتشخيص يعثر وخطة تحسين قابلة للتنفيذ.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="font-size:18px">💡</div>
+        <h3>مشاريع توسع</h3>
+        <p>اختبار جاهزية التوسع ومواءمة الموارد والمسارات.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section-sm section-bg">
+    <div class="cta-banner">
+      <div>
+        <h2>جاهز لتحويل مشروعك الصحي إلى منظومة تشغيلية قابلة للتنفيذ؟</h2>
+        <p>ابدأ بتقييم تشخيصي يوضح الفجوات، الأولويات، والمخرجات المطلوبة قبل أي قرار تنفيذي مكلف.</p>
+      </div>
+      <div class="cta-banner-btns">
+        <button class="btn-primary" onclick="goTo('contact')">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('contact')">احجز اجتماعًا تعريفيًا</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==========================================
+     CONTACT PAGE (تواصل معنا)
+     ========================================== -->
+<div id="page-contact" class="page">
+
+  <div class="hero">
+    <div class="hero-content">
+      <h1>
+        <span class="block">ابدأ بتقييم تشخيصي</span>
+        <span class="teal">قبل أي قرار تنفيذي مكلف</span>
+      </h1>
+      <p>شاركنا نوع مشروعك ومرحلة النضج الحالية، وسنساعدك في تحديد نطاق التدخل المناسب.</p>
+      <div class="btns-row">
+        <button class="btn-primary" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})">ابدأ بتقييم تشخيصي</button>
+        <button class="btn-outline" onclick="goTo('services')">استعرض خدماتنا</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-top"><div class="hero-card-box"></div><div class="hero-card-box"></div><div class="hero-card-box"></div></div>
+        <div class="hero-card-label">HeuMed</div>
+        <div class="hero-card-btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Form Section -->
+  <div class="section section-white" id="contactForm">
+    <div class="section-header">
+      <h2>طلب تقييم تشخيصي</h2>
+      <div class="underline-teal"></div>
+      <p>أرسل بياناتك الأساسية وسنتواصل معك لتحديد نطاق التقييم المناسب.</p>
+    </div>
+    <div class="contact-layout">
+      <!-- Form -->
+      <div class="contact-form">
+        <h3>نموذج الطلب</h3>
+        <div class="form-row">
+          <input type="text" id="f-name" placeholder="الاسم" autocomplete="name">
+        </div>
+        <div class="form-row">
+          <input type="tel" id="f-phone" placeholder="رقم الجوال" autocomplete="tel">
+        </div>
+        <div class="form-row">
+          <input type="email" id="f-email" placeholder="البريد الإلكتروني" autocomplete="email">
+        </div>
+        <div class="form-row">
+          <input type="text" id="f-project" placeholder="نوع المشروع">
+        </div>
+        <div class="form-row">
+          <input type="text" id="f-desc" placeholder="وصف مختصر للاحتياج">
+        </div>
+        <button class="form-submit" onclick="handleSubmit()">إرسال الطلب</button>
+      </div>
+
+      <!-- Info -->
+      <div class="contact-info">
+        <h3>بيانات التواصل</h3>
+        <div class="contact-row">
+          <div class="check-icon yes" style="margin-top:0">✓</div>
+          +966 56 123 4567
+        </div>
+        <div class="contact-row">
+          <div class="check-icon yes" style="margin-top:0">✓</div>
+          info@heumedpartners.com
+        </div>
+        <div class="contact-row">
+          <div class="check-icon yes" style="margin-top:0">✓</div>
+          المملكة العربية السعودية
+        </div>
+        <div class="contact-row">
+          <div class="check-icon yes" style="margin-top:0">✓</div>
+          احجز اجتماعًا تعريفيًا
+        </div>
+        <button class="wa-btn-full" onclick="window.open('https://wa.me/966561234567','_blank')">تواصل عبر واتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
+      <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
+      <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
+      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+    </div>
+    <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
+  </footer>
+</div>
+
+
+<!-- ==================== JS ==================== -->
 <script>
-// ===== CURSOR =====
-const cur = document.getElementById('cur');
-const ring = document.getElementById('cur-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove', e=>{
-  mx=e.clientX; my=e.clientY;
-  cur.style.left=(mx-7)+'px'; cur.style.top=(my-7)+'px';
-});
-(function animateRing(){
-  rx+=(mx-rx)*0.1; ry+=(my-ry)*0.1;
-  ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px';
-  requestAnimationFrame(animateRing);
-})();
+/* ─────────────────────────────────────────
+   PAGE NAVIGATION
+───────────────────────────────────────── */
+function goTo(name) {
+  const current = document.querySelector('.page.active');
+  const next    = document.getElementById('page-' + name);
+  if (!next || (current && current === next)) return;
 
-// ===== SCROLL ANIMATIONS =====
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
-},{threshold:0.12});
-document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+  // Nav highlight
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.remove('active');
+    if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + name + "'"))
+      l.classList.add('active');
+  });
 
-// ===== COUNTERS =====
-function animateCounter(el, target, suffix=''){
-  let val=0;
-  const step = target/60;
-  const t = setInterval(()=>{
-    val = Math.min(val+step, target);
-    el.textContent = Math.floor(val);
-    if(val>=target) clearInterval(t);
-  },25);
-}
-const counterObs = new IntersectionObserver(entries=>{
-  if(entries[0].isIntersecting){
-    animateCounter(document.getElementById('c1'),240);
-    animateCounter(document.getElementById('c2'),98);
-    animateCounter(document.getElementById('c3'),5);
-    animateCounter(document.getElementById('c4'),3);
-    counterObs.disconnect();
+  if (!current) {
+    next.classList.add('active');
+    window.scrollTo({ top: 0 });
+    scheduleReveal();
+    return;
   }
-},{threshold:0.5});
-counterObs.observe(document.querySelector('.counters'));
 
-// ===== MULTI-STEP FORM =====
-let currentStep=1, selectedPrice=0, selectedFeatures=[];
+  // Fade out → swap → fade in
+  current.style.transition = 'opacity 0.15s ease';
+  current.style.opacity    = '0';
 
-function nextStep(step){
-  // Validate step 1
-  if(currentStep===1 && step===2){
-    const name=document.querySelector('[name="name"]').value;
-    const phone=document.querySelector('[name="phone"]').value;
-    const email=document.querySelector('[name="email"]').value;
-    if(!name||!phone||!email){ alert('يرجى ملء الحقول المطلوبة'); return; }
-  }
-  document.getElementById('step'+currentStep).style.display='none';
-  document.getElementById('step'+step).style.display='block';
-  currentStep=step;
-
-  // Update progress
-  for(let i=1;i<=3;i++){
-    document.getElementById('ps'+i).classList.toggle('done', i<=step);
-  }
-  document.getElementById('stepLabel').textContent=step;
-}
-
-function selectPkg(el, name, price){
-  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  selectedPrice=price;
-  document.getElementById('serviceType').value=name;
-  document.getElementById('priceDisplay').innerHTML=price.toLocaleString()+' <small>ريال+</small>';
-}
-
-function toggleFeat(el, name){
-  el.classList.toggle('active');
-  if(el.classList.contains('active')){
-    selectedFeatures.push(name);
-    selectedPrice+=200;
-  } else {
-    selectedFeatures=selectedFeatures.filter(f=>f!==name);
-    selectedPrice-=200;
-  }
-  document.getElementById('featuresInput').value=selectedFeatures.join(' / ');
-  if(selectedPrice>0){
-    document.getElementById('priceDisplay').innerHTML=selectedPrice.toLocaleString()+' <small>ريال+</small>';
-  }
-}
-
-// ===== FORM SUBMIT =====
-document.getElementById('orderForm').addEventListener('submit', async function(e){
-  e.preventDefault();
-  const btn=document.getElementById('submitBtn');
-  btn.textContent='⏳ جاري الإرسال...';
-  btn.disabled=true;
-
-  // Generate reference number
-  const ref='PC-'+Date.now().toString().slice(-4);
-
-  try {
-    const formData=new FormData(this);
-    formData.append('ref_number', ref);
-    formData.append('submitted_at', new Date().toLocaleString('ar-SA'));
-
-    // Submit to Formspree
-    const res=await fetch(this.action,{
-      method:'POST',
-      body:formData,
-      headers:{'Accept':'application/json'}
+  setTimeout(() => {
+    current.style.transition = '';
+    current.style.opacity    = '';
+    current.classList.remove('active');
+    next.classList.add('active');
+    next.style.opacity    = '0';
+    next.style.transition = 'opacity 0.3s ease';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        next.style.opacity = '1';
+        setTimeout(() => {
+          next.style.transition = '';
+          next.style.opacity    = '';
+        }, 320);
+      });
     });
+    window.scrollTo({ top: 0 });
+    scheduleReveal();
+  }, 160);
+}
 
-    if(res.ok){
-      document.getElementById('formContent').style.display='none';
-      document.getElementById('refNum').textContent=ref;
-      document.getElementById('successScreen').classList.add('show');
-    } else {
-      alert('حدث خطأ، يرجى المحاولة مجدداً');
-      btn.textContent='إرسال الطلب 🚀';
-      btn.disabled=false;
+/* ─────────────────────────────────────────
+   MOBILE MENU
+───────────────────────────────────────── */
+function toggleMobile() {
+  document.querySelector('.hamburger').classList.toggle('open');
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobile() {
+  document.querySelector('.hamburger').classList.remove('open');
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+/* ─────────────────────────────────────────
+   TOAST SYSTEM
+───────────────────────────────────────── */
+function showToast(msg, type, duration) {
+  type     = type     || 'success';
+  duration = duration || 4000;
+  var icons = { success: '✓', error: '✕', warn: '!' };
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.innerHTML =
+    '<div class="toast-icon">' + icons[type] + '</div>' +
+    '<div class="toast-msg">'  + msg          + '</div>' +
+    '<button class="toast-close" onclick="dismissToast(this.parentElement)">×</button>';
+  container.appendChild(toast);
+  setTimeout(function() { dismissToast(toast); }, duration);
+}
+function dismissToast(el) {
+  if (!el || el.classList.contains('toast-out')) return;
+  el.classList.add('toast-out');
+  setTimeout(function() { if (el.parentElement) el.remove(); }, 320);
+}
+
+/* ─────────────────────────────────────────
+   FORM VALIDATION
+───────────────────────────────────────── */
+function handleSubmit() {
+  var name    = document.getElementById('f-name');
+  var phone   = document.getElementById('f-phone');
+  var email   = document.getElementById('f-email');
+  var project = document.getElementById('f-project');
+  var desc    = document.getElementById('f-desc');
+  var btn     = document.querySelector('.form-submit');
+
+  [name, phone, email, project, desc].forEach(function(el) {
+    el.classList.remove('input-error', 'input-ok');
+  });
+
+  if (!name.value.trim()) {
+    name.classList.add('input-error');
+    showToast('الرجاء إدخال الاسم', 'error');
+    name.focus(); return;
+  }
+  if (!/^[0-9+\s]{9,15}$/.test(phone.value.trim())) {
+    phone.classList.add('input-error');
+    showToast('الرجاء إدخال رقم جوال صحيح', 'error');
+    phone.focus(); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+    email.classList.add('input-error');
+    showToast('الرجاء إدخال بريد إلكتروني صحيح', 'error');
+    email.focus(); return;
+  }
+  if (!project.value.trim()) {
+    project.classList.add('input-error');
+    showToast('الرجاء تحديد نوع المشروع', 'warn');
+    project.focus(); return;
+  }
+
+  [name, phone, email, project, desc].forEach(function(el) {
+    el.classList.add('input-ok');
+  });
+  btn.classList.add('loading');
+  btn.textContent = 'جارٍ الإرسال...';
+
+  setTimeout(function() {
+    btn.classList.remove('loading');
+    btn.textContent = 'إرسال الطلب';
+    [name, phone, email, project, desc].forEach(function(el) {
+      el.value = '';
+      el.classList.remove('input-ok');
+    });
+    showToast('تم إرسال طلبك بنجاح! سنتواصل معك قريبًا.', 'success', 6000);
+  }, 1400);
+}
+
+/* ─────────────────────────────────────────
+   SCROLL REVEAL (section headers only — safe)
+───────────────────────────────────────── */
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
     }
-  } catch(err){
-    // Offline fallback — still show success
-    document.getElementById('formContent').style.display='none';
-    document.getElementById('refNum').textContent=ref;
-    document.getElementById('successScreen').classList.add('show');
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+function scheduleReveal() {
+  setTimeout(function() {
+    document.querySelectorAll('.page.active .section-header:not(.visible)').forEach(function(el) {
+      el.classList.add('reveal');
+      revealObserver.observe(el);
+    });
+  }, 80);
+}
+
+/* ─────────────────────────────────────────
+   NAV SCROLL SHADOW
+───────────────────────────────────────── */
+window.addEventListener('scroll', function() {
+  document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 10);
+});
+
+/* ─────────────────────────────────────────
+   CLOSE MOBILE ON OUTSIDE CLICK
+───────────────────────────────────────── */
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('mobileMenu');
+  var ham  = document.querySelector('.hamburger');
+  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) {
+    closeMobile();
   }
 });
+
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+scheduleReveal();
 </script>
 </body>
 </html>
