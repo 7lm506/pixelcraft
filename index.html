@@ -379,6 +379,10 @@ footer{
   color:rgba(255,255,255,.5);
   text-decoration:none;margin-bottom:8px;
   transition:color .2s;
+  text-align:right;
+}
+.footer-col span[style*="direction:ltr"]{
+  text-align:right;
 }
 .footer-col a:hover{color:var(--teal)}
 .footer-bottom{
@@ -679,6 +683,21 @@ footer{
   .cta-banner{grid-template-columns:1fr}
   .cta-banner-btns{flex-direction:column;align-items:flex-start}
   .footer-bottom{flex-direction:column;text-align:center}
+
+  /* Prevent button hover transforms causing overflow */
+  .btn-primary:hover,.btn-outline:hover,.btn-nav:hover{transform:none;box-shadow:none}
+  .card:hover,.mvv-card:hover,.step-card:hover,.pkg-card:hover{transform:none}
+  .wm-item:hover,.chal-card:hover,.sector-item:hover,.why-reason:hover{transform:none;box-shadow:none}
+
+  /* Fix contact layout direction on mobile */
+  .contact-row{direction:rtl}
+
+  /* Ensure hero badges wrap nicely */
+  .hero-badges{gap:12px}
+
+  /* Tighten cta-banner padding */
+  .cta-banner{padding:32px 24px}
+  .cta-banner h2{font-size:20px}
 }
 
 @media(min-width:961px) and (max-width:1200px){
@@ -811,9 +830,8 @@ nav.scrolled {
 
 /* Mobile menu items */
 .mobile-menu a {
-  transition: color 0.18s, background 0.18s, padding-right 0.18s;
+  transition: color 0.18s, background 0.18s;
 }
-.mobile-menu a:hover { padding-right: 32px; }
 
 /* Form inputs */
 .form-row input, .form-row select, .form-row textarea {
@@ -824,8 +842,8 @@ nav.scrolled {
 }
 
 /* Footer links */
-.footer-col a { transition: color 0.18s, padding-right 0.18s; }
-.footer-col a:hover { color: var(--teal) !important; padding-right: 4px; }
+.footer-col a { transition: color 0.18s; }
+.footer-col a:hover { color: var(--teal) !important; }
 
 /* Hero content stagger */
 .hero-content > * {
@@ -837,8 +855,8 @@ nav.scrolled {
 .hero-content > *:nth-child(4) { animation-delay: 0.4s; }
 .hero-content > *:nth-child(5) { animation-delay: 0.5s; }
 @keyframes heroItemIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Hamburger animation */
@@ -970,6 +988,24 @@ nav.scrolled {
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+/* Premium phone link in contact info */
+.contact-phone-link {
+  direction: ltr;
+  unicode-bidi: embed;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--navy);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, var(--teal) 0%, #007a7a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: opacity 0.2s;
+}
+.contact-phone-link:hover { opacity: 0.75; }
 
 </style>
 </head>
@@ -1231,7 +1267,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -1383,7 +1419,7 @@ nav.scrolled {
       </div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -1502,7 +1538,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -1630,7 +1666,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -1794,7 +1830,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -1935,7 +1971,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
@@ -2002,7 +2038,7 @@ nav.scrolled {
         <h3>بيانات التواصل</h3>
         <div class="contact-row">
           <div class="check-icon yes" style="margin-top:0">✓</div>
-          +966 56 123 4567
+          <a href="tel:+966561234567" class="contact-phone-link">+966 56 123 4567</a>
         </div>
         <div class="contact-row">
           <div class="check-icon yes" style="margin-top:0">✓</div>
@@ -2026,7 +2062,7 @@ nav.scrolled {
       <div class="footer-brand"><div onclick="goTo('home')" style="margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 180 180"><polygon points="14.4,14.4 39.6,14.4 39.6,165.6 14.4,165.6" fill="#ffffff"/><polygon points="52.2,14.4 75.6,14.4 75.6,70.2 111.6,91.8 111.6,118.8 52.2,84.6" fill="#ffffff"/><polygon points="52.2,100.8 75.6,115.2 75.6,165.6 52.2,165.6" fill="#ffffff"/><polygon points="140.4,14.4 165.6,14.4 165.6,165.6 140.4,165.6" fill="#00AFAF"/><polygon points="99,36 129.6,18 129.6,75.6 99,93.6" fill="#00AFAF"/><polygon points="95.4,111.6 126,93.6 126,126 95.4,144" fill="#00AFAF"/></svg><div style="line-height:1.15"><div style="font-size:14px;font-weight:800;color:#ffffff">HeuMed</div><div style="font-size:9px;color:#00AFAF;font-weight:600;letter-spacing:0.5px">Partners</div></div></div><p>شريك تطوير وتشغيل المنظومات الصحية</p></div>
       <div class="footer-col"><h4>خدماتنا</h4><a onclick="goTo('services')">تطوير المشاريع</a><a onclick="goTo('services')">الجودة والامتثال</a><a onclick="goTo('services')">هندسة الإيرادات</a></div>
       <div class="footer-col"><h4>روابط</h4><a onclick="goTo('home')">الرئيسية</a><a onclick="goTo('services')">خدماتنا</a><a onclick="goTo('method')">منهجيتنا</a></div>
-      <div class="footer-col"><h4>تواصل</h4><span>4567 123 56 966+</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
+      <div class="footer-col"><h4>تواصل</h4><span style="direction:ltr;unicode-bidi:embed;white-space:nowrap;display:block;text-align:right">+966 56 123 4567</span><span>info@heumedpartners.com</span><span>المملكة العربية السعودية</span></div>
     </div>
     <div class="footer-bottom"><span>تواصل معنا</span><span>© HeuMed Partners 2026. جميع الحقوق محفوظة.</span></div>
   </footer>
